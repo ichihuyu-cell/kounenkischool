@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="55%" r="50%">
+      <stop offset="0%" stop-color="#A090C8" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#0a0a1a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moonGrad" cx="65%" cy="35%" r="65%"><stop offset="0%" stop-color="#D8D0F0"/><stop offset="45%" stop-color="#9080C0"/><stop offset="100%" stop-color="#2C1F4A"/></radialGradient>
+  </defs>
+
+  <!-- 背景グロー -->
+  <rect width="200" height="200" fill="#0a0a1a"/>
+  <circle cx="100" cy="100" r="95" fill="url(#bgGlow)"/>
+
+  <!-- 月 -->
+  <circle cx="100" cy="108" r="72" fill="url(#moonGrad)"/><rect x="28" y="36" width="72" height="144" fill="#1a1a2e"/>
+
+  <!-- クレーター -->
+  <circle cx="76" cy="90" r="7" fill="#000000" opacity="0.15"/>
+  <circle cx="118" cy="118" r="5" fill="#000000" opacity="0.1"/>
+  <circle cx="92" cy="126" r="5" fill="#000000" opacity="0.1"/>
+
+  <!-- 月のハイライト -->
+  <ellipse cx="83" cy="80" rx="16" ry="10" fill="white" opacity="0.1" transform="rotate(-20 83 80)"/>
+
+  <!-- 茎 -->
+  <path d="M100 148 Q97 138 95 125" stroke="#4a8e4e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="91" cy="135" rx="9" ry="5" fill="#4a8e4e" opacity="0.8" transform="rotate(-35 91 135)"/>
+
+  <!-- 花びら -->
+  <ellipse cx="100" cy="76" rx="12" ry="24" fill="#FFB6C1" transform="rotate(0 100 100)"/>
+  <ellipse cx="82" cy="84" rx="11" ry="22" fill="#FF9AAF" transform="rotate(-30 91 100)"/>
+  <ellipse cx="118" cy="84" rx="11" ry="22" fill="#FFB6C1" transform="rotate(30 109 100)"/>
+  <ellipse cx="78" cy="102" rx="10" ry="20" fill="#FF8899" transform="rotate(-60 89 106)"/>
+  <ellipse cx="122" cy="102" rx="10" ry="20" fill="#FF9AAF" transform="rotate(60 111 106)"/>
+
+  <!-- 花の中心 -->
+  <circle cx="100" cy="100" r="9" fill="#FF69B4"/>
+  <circle cx="100" cy="100" r="5" fill="#FFB6C1"/>
+  <circle cx="100" cy="100" r="2.5" fill="white" opacity="0.8"/>
+
+  <!-- 星のきらめき -->
+  <g fill="white" opacity="0.7">
+    <circle cx="42" cy="52" r="1.5"/>
+    <circle cx="158" cy="44" r="1"/>
+    <circle cx="164" cy="138" r="1.5"/>
+    <circle cx="36" cy="148" r="1"/>
+    <circle cx="132" cy="36" r="1"/>
+  </g>
+  <g stroke="white" stroke-width="0.8" opacity="0.5">
+    <line x1="42" y1="49" x2="42" y2="55"/>
+    <line x1="39" y1="52" x2="45" y2="52"/>
+    <line x1="158" y1="41" x2="158" y2="47"/>
+    <line x1="155" y1="44" x2="161" y2="44"/>
+  </g>
+</svg>
