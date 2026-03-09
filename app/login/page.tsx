@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
 
 export default function LoginPage() {
@@ -11,7 +11,34 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showReset, setShowReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetMessage, setResetMessage] = useState('');
+  const [resetError, setResetError] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
   const router = useRouter();
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError('');
+    setResetMessage('');
+    setResetLoading(true);
+
+    try {
+      await sendPasswordResetEmail(auth, resetEmail);
+      setResetMessage('パスワードリセットメールを送信しました。メールをご確認ください。');
+    } catch (err: any) {
+      if (err.code === 'auth/user-not-found') {
+        setResetError('このメールアドレスのアカウントは見つかりませんでした。');
+      } else if (err.code === 'auth/invalid-email') {
+        setResetError('メールアドレスの形式が正しくありません。');
+      } else {
+        setResetError('メールの送信に失敗しました。もう一度お試しください。');
+      }
+    } finally {
+      setResetLoading(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,7 +210,7 @@ export default function LoginPage() {
               />
             </div>
 
-            <div style={{ marginBottom: '32px' }}>
+            <div style={{ marginBottom: '16px' }}>
               <label style={{
                 display: 'block',
                 fontSize: '13px',
@@ -213,6 +240,25 @@ export default function LoginPage() {
                 onFocus={(e) => e.target.style.border = '1px solid #2C3E5F'}
                 onBlur={(e) => e.target.style.border = '1px solid #F0F0F0'}
               />
+            </div>
+
+            <div style={{ marginBottom: '32px', textAlign: 'right' }}>
+              <button
+                type="button"
+                onClick={() => { setShowReset(true); setResetEmail(email); }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#2C3E5F',
+                  fontSize: '13px',
+                  fontWeight: '300',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  padding: 0
+                }}
+              >
+                パスワードをお忘れですか？
+              </button>
             </div>
 
             <button
@@ -258,6 +304,166 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* パスワードリセットモーダル */}
+      {showReset && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#FFFFFF',
+            borderRadius: '12px',
+            padding: '40px',
+            width: '100%',
+            maxWidth: '400px'
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: '300',
+              color: '#2C3E5F',
+              marginBottom: '8px',
+              letterSpacing: '0.05em'
+            }}>
+              パスワードリセット
+            </h2>
+            <p style={{
+              fontSize: '13px',
+              color: '#4A4A4A',
+              fontWeight: '300',
+              marginBottom: '24px',
+              lineHeight: '1.6'
+            }}>
+              登録済みのメールアドレスを入力してください。パスワードリセット用のメールをお送りします。
+            </p>
+
+            {resetMessage && (
+              <div style={{
+                padding: '12px',
+                background: '#F0FFF0',
+                border: '1px solid #C8E6C9',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                fontSize: '14px',
+                color: '#2E7D32',
+                fontWeight: '300'
+              }}>
+                {resetMessage}
+              </div>
+            )}
+
+            {resetError && (
+              <div style={{
+                padding: '12px',
+                background: '#FFF0F0',
+                border: '1px solid #FFE0E0',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                fontSize: '14px',
+                color: '#D32F2F',
+                fontWeight: '300'
+              }}>
+                {resetError}
+              </div>
+            )}
+
+            {!resetMessage ? (
+              <form onSubmit={handlePasswordReset}>
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '13px',
+                    color: '#4A4A4A',
+                    marginBottom: '8px',
+                    fontWeight: '300'
+                  }}>
+                    メールアドレス
+                  </label>
+                  <input
+                    type="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      border: '1px solid #F0F0F0',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '300',
+                      color: '#4A4A4A',
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button
+                    type="button"
+                    onClick={() => { setShowReset(false); setResetMessage(''); setResetError(''); }}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      background: '#FFFFFF',
+                      color: '#4A4A4A',
+                      border: '1px solid #F0F0F0',
+                      borderRadius: '24px',
+                      fontSize: '14px',
+                      fontWeight: '300',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    キャンセル
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={resetLoading}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      background: resetLoading ? '#999' : '#2C3E5F',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      borderRadius: '24px',
+                      fontSize: '14px',
+                      fontWeight: '300',
+                      cursor: resetLoading ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    {resetLoading ? '送信中...' : '送信する'}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <button
+                type="button"
+                onClick={() => { setShowReset(false); setResetMessage(''); setResetError(''); }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  background: '#2C3E5F',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '24px',
+                  fontSize: '14px',
+                  fontWeight: '300',
+                  cursor: 'pointer'
+                }}
+              >
+                閉じる
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
