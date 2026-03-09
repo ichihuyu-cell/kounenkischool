@@ -382,7 +382,7 @@ export default function Home() {
           </h2>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
             gap: '32px'
           }}>
             <div style={{
