@@ -1,21 +1,37 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <div style={{
       minHeight: '100vh',
       background: '#FFFFFF'
     }}>
+      <style>{`
+        .home-nav-about { display: inline-block; }
+        .home-nav-register { display: inline-block; }
+        .home-hamburger { display: none; }
+        .home-mobile-menu { display: none; }
+        @media (max-width: 768px) {
+          .home-nav-about { display: none !important; }
+          .home-nav-register { display: none !important; }
+          .home-hamburger { display: flex !important; }
+          .home-mobile-menu { display: flex !important; }
+        }
+      `}</style>
       {/* ヘッダー */}
       <header style={{
-        padding: '20px 40px',
+        padding: '20px 20px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         background: '#FFFFFF',
-        borderBottom: '1px solid #F0F0F0'
+        borderBottom: '1px solid #F0F0F0',
+        position: 'relative'
       }}>
         <div style={{
           display: 'flex',
@@ -54,8 +70,8 @@ export default function Home() {
             RUNEERA
           </span>
         </div>
-        <div style={{ display: 'flex', gap: '16px', flexShrink: 0 }}>
-          <Link href="/about" style={{
+        <div style={{ display: 'flex', gap: '16px', flexShrink: 0, alignItems: 'center' }}>
+          <Link href="/about" className="home-nav-about" style={{
             padding: '10px 24px',
             color: '#4A4A4A',
             textDecoration: 'none',
@@ -75,11 +91,12 @@ export default function Home() {
             fontWeight: '300',
             border: '1px solid #F0F0F0',
             fontSize: '14px',
-            letterSpacing: '0.03em'
+            letterSpacing: '0.03em',
+            whiteSpace: 'nowrap'
           }}>
             ログイン
           </Link>
-          <Link href="/register" style={{
+          <Link href="/register" className="home-nav-register" style={{
             padding: '10px 24px',
             background: '#2C3E5F',
             color: '#FFFFFF',
@@ -87,11 +104,67 @@ export default function Home() {
             textDecoration: 'none',
             fontWeight: '300',
             fontSize: '14px',
-            letterSpacing: '0.03em'
+            letterSpacing: '0.03em',
+            whiteSpace: 'nowrap'
           }}>
             無料で始める
           </Link>
+          {/* ハンバーガーメニュー（スマホのみ） */}
+          <button
+            className="home-hamburger"
+            onClick={() => setMenuOpen(!menuOpen)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '8px',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              gap: '4px'
+            }}
+          >
+            <span style={{ display: 'block', width: '20px', height: '2px', background: '#2C3E5F', transition: 'all 0.3s', transform: menuOpen ? 'rotate(45deg) translateY(6px)' : 'none' }} />
+            <span style={{ display: 'block', width: '20px', height: '2px', background: '#2C3E5F', transition: 'all 0.3s', opacity: menuOpen ? 0 : 1 }} />
+            <span style={{ display: 'block', width: '20px', height: '2px', background: '#2C3E5F', transition: 'all 0.3s', transform: menuOpen ? 'rotate(-45deg) translateY(-6px)' : 'none' }} />
+          </button>
         </div>
+        {/* モバイルメニュー */}
+        {menuOpen && (
+          <div className="home-mobile-menu" style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            background: '#FFFFFF',
+            borderBottom: '1px solid #F0F0F0',
+            flexDirection: 'column',
+            padding: '16px 20px',
+            gap: '12px',
+            zIndex: 100,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+          }}>
+            <Link href="/about" onClick={() => setMenuOpen(false)} style={{
+              padding: '12px 0',
+              color: '#4A4A4A',
+              textDecoration: 'none',
+              fontWeight: '300',
+              fontSize: '14px',
+              borderBottom: '1px solid #F0F0F0'
+            }}>
+              このサイトについて
+            </Link>
+            <Link href="/register" onClick={() => setMenuOpen(false)} style={{
+              padding: '12px 0',
+              color: '#2C3E5F',
+              textDecoration: 'none',
+              fontWeight: '400',
+              fontSize: '14px'
+            }}>
+              無料で始める
+            </Link>
+          </div>
+        )}
       </header>
 
       <div style={{
