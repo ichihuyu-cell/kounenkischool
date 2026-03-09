@@ -69,7 +69,7 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav style={{ display: 'flex', gap: '32px', alignItems: 'center' }}>
+        <nav style={{ display: 'flex', gap: '32px', alignItems: 'center', flexShrink: 0, whiteSpace: 'nowrap' }}>
           <Link
             href="/dashboard"
             style={{

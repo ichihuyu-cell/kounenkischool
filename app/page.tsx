@@ -54,14 +54,15 @@ export default function Home() {
             RUNEERA
           </span>
         </div>
-        <div style={{ display: 'flex', gap: '16px' }}>
+        <div style={{ display: 'flex', gap: '16px', flexShrink: 0 }}>
           <Link href="/about" style={{
             padding: '10px 24px',
             color: '#4A4A4A',
             textDecoration: 'none',
             fontWeight: '300',
             fontSize: '14px',
-            letterSpacing: '0.03em'
+            letterSpacing: '0.03em',
+            whiteSpace: 'nowrap'
           }}>
             このサイトについて
           </Link>
