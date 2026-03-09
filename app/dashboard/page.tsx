@@ -134,7 +134,8 @@ export default function DashboardPage() {
             boxShadow: '0 4px 16px rgba(255, 244, 204, 0.4)',
             display: 'flex',
             alignItems: 'center',
-            gap: '20px'
+            gap: '20px',
+            flexWrap: 'wrap'
           }}>
             <div style={{
               fontSize: '48px',
@@ -224,7 +225,7 @@ export default function DashboardPage() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
           gap: '24px',
           marginBottom: '48px'
         }}>
@@ -273,7 +274,7 @@ export default function DashboardPage() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
           gap: '20px',
           marginBottom: '48px'
         }}>
@@ -332,7 +333,7 @@ export default function DashboardPage() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
           gap: '32px'
         }}>
           <div style={{
