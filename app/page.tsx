@@ -284,7 +284,7 @@ export default function Home() {
                 marginBottom: '16px',
                 letterSpacing: '0.05em'
               }}>
-                症状を記録
+                揺らぎを記録
               </h3>
               <p style={{
                 fontSize: '14px',

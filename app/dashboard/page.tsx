@@ -240,7 +240,7 @@ export default function DashboardPage() {
           }}>
             <div style={{ fontSize: '32px', marginBottom: '16px' }}>📝</div>
             <div style={{ fontSize: '18px', fontWeight: '300', letterSpacing: '0.05em' }}>更年期クラッカー</div>
-            <div style={{ fontSize: '13px', opacity: 0.9, marginTop: '8px', fontWeight: '300' }}>症状を記録する</div>
+            <div style={{ fontSize: '13px', opacity: 0.9, marginTop: '8px', fontWeight: '300' }}>揺らぎを記録する</div>
           </Link>
 
           <Link href="/community" style={{
