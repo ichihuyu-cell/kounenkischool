@@ -324,7 +324,7 @@ export default function Home() {
                 lineHeight: '1.8',
                 fontWeight: '300'
               }}>
-                周期や傾向を可視化。「いつ」「どんな症状」が出るかが見えてきます。
+                周期や傾向を可視化。「いつ」「どんな揺らぎ」が出るかが見えてきます。
               </p>
             </div>
 
