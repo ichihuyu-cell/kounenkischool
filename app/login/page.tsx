@@ -16,6 +16,7 @@ export default function LoginPage() {
   const [resetMessage, setResetMessage] = useState('');
   const [resetError, setResetError] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handlePasswordReset = async (e: React.FormEvent) => {
@@ -70,6 +71,7 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/dashboard');
     } catch (err: any) {
+      console.error('Login error:', err.code, err.message);
       setError('ログインに失敗しました。メールアドレスとパスワードを確認してください。');
     } finally {
       setLoading(false);
@@ -242,25 +244,59 @@ export default function LoginPage() {
               }}>
                 パスワード
               </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid #F0F0F0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '300',
-                  color: '#4A4A4A',
-                  outline: 'none',
-                  transition: 'border 0.3s'
-                }}
-                onFocus={(e) => e.target.style.border = '1px solid #2C3E5F'}
-                onBlur={(e) => e.target.style.border = '1px solid #F0F0F0'}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '12px 44px 12px 16px',
+                    border: '1px solid #F0F0F0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '300',
+                    color: '#4A4A4A',
+                    outline: 'none',
+                    transition: 'border 0.3s'
+                  }}
+                  onFocus={(e) => e.target.style.border = '1px solid #2C3E5F'}
+                  onBlur={(e) => e.target.style.border = '1px solid #F0F0F0'}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#999'
+                  }}
+                  aria-label={showPassword ? 'パスワードを隠す' : 'パスワードを表示'}
+                >
+                  {showPassword ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             <div style={{ marginBottom: '32px', textAlign: 'right' }}>
