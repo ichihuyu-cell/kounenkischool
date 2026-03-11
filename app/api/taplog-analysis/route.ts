@@ -1,6 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
 
+// Vercel Serverless Functionのタイムアウトを延長（Hobbyプラン最大60秒）
+export const maxDuration = 60;
+
 const ALLOWED_ORIGINS = [
   'https://taplog-pink.vercel.app',
   'http://localhost:3000',
@@ -104,12 +107,17 @@ ${summary}
     if (!apiKey) {
       console.error('AI Analysis error: ANTHROPIC_API_KEY is not set');
       return NextResponse.json(
-        { error: 'APIキーが設定されていません。' },
+        { error: 'APIキーが設定されていません。管理者にお問い合わせください。', debug: 'ANTHROPIC_API_KEY is empty' },
         { status: 500, headers }
       );
     }
 
-    const client = new Anthropic({ apiKey });
+    console.log('AI Analysis: starting request, entries:', entries.length, ', apiKey prefix:', apiKey.substring(0, 12) + '...');
+
+    const client = new Anthropic({
+      apiKey,
+      timeout: 50000,
+    });
 
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
@@ -119,22 +127,24 @@ ${summary}
 
     const text = message.content[0].type === 'text' ? message.content[0].text : '';
 
+    console.log('AI Analysis: success, response length:', text.length);
+
     return NextResponse.json(
       { analysis: text, entries_count: entries.length },
       { headers }
     );
   } catch (e: unknown) {
     if (e instanceof Anthropic.APIError) {
-      console.error('AI Analysis API error:', e.status, e.message, e.error);
+      console.error('AI Analysis API error:', e.status, e.message, JSON.stringify(e.error));
       return NextResponse.json(
-        { error: `AI分析でエラーが発生しました（${e.status}）。しばらくしてから再度お試しください。` },
+        { error: `AI分析でエラーが発生しました（${e.status}）。しばらくしてから再度お試しください。`, debug: `${e.status}: ${e.message}` },
         { status: 500, headers }
       );
     }
-    const message = e instanceof Error ? e.message : 'Unknown error';
-    console.error('AI Analysis error:', message);
+    const errMsg = e instanceof Error ? e.message : 'Unknown error';
+    console.error('AI Analysis error:', errMsg);
     return NextResponse.json(
-      { error: '分析に失敗しました。しばらくしてから再度お試しください。' },
+      { error: '分析に失敗しました。しばらくしてから再度お試しください。', debug: errMsg },
       { status: 500, headers }
     );
   }
