@@ -72,6 +72,7 @@ export default function LoginPage() {
       router.push('/dashboard');
     } catch (err: any) {
       console.error('Login error:', err.code, err.message);
+      console.log('Login error detail:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
       setError('ログインに失敗しました。メールアドレスとパスワードを確認してください。');
     } finally {
       setLoading(false);
