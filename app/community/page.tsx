@@ -6,6 +6,14 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
 import Header from '../components/Header';
 
+interface Reply {
+  id: number;
+  author: string;
+  avatar: string;
+  time: string;
+  content: string;
+}
+
 interface Post {
   id: number;
   author: string;
@@ -15,6 +23,7 @@ interface Post {
   likes: number;
   liked: boolean;
   tag?: string;
+  replies: Reply[];
 }
 
 const DUMMY_POSTS: Post[] = [
@@ -27,6 +36,9 @@ const DUMMY_POSTS: Post[] = [
     likes: 12,
     liked: false,
     tag: 'からだの揺らぎ',
+    replies: [
+      { id: 101, author: 'ゆき', avatar: '❄️', time: '1時間前', content: '私も冷たいタオル試してみます！首の後ろを冷やすのが良いと聞きました。' },
+    ],
   },
   {
     id: 2,
@@ -37,6 +49,7 @@ const DUMMY_POSTS: Post[] = [
     likes: 28,
     liked: false,
     tag: 'こころの揺らぎ',
+    replies: [],
   },
   {
     id: 3,
@@ -47,6 +60,10 @@ const DUMMY_POSTS: Post[] = [
     likes: 35,
     liked: false,
     tag: '月と暮らし',
+    replies: [
+      { id: 102, author: 'みき', avatar: '🍀', time: '20時間前', content: '私も新月前後は調子が悪くなります。パターンが分かるだけで気持ちが楽になりますよね。' },
+      { id: 103, author: 'さくら', avatar: '🌸', time: '18時間前', content: '「なぜか辛い」が「この時期だから」に変わる、すごく共感します。記録って大事ですね。' },
+    ],
   },
   {
     id: 4,
@@ -57,6 +74,7 @@ const DUMMY_POSTS: Post[] = [
     likes: 42,
     liked: false,
     tag: 'こころの揺らぎ',
+    replies: [],
   },
   {
     id: 5,
@@ -67,6 +85,9 @@ const DUMMY_POSTS: Post[] = [
     likes: 19,
     liked: false,
     tag: 'からだの揺らぎ',
+    replies: [
+      { id: 104, author: 'はな', avatar: '🌷', time: '2日前', content: '整体いいですよね。私もご褒美タイムとして月2で通っています。自分を労わる時間、大切にしましょう。' },
+    ],
   },
 ];
 
@@ -188,6 +209,8 @@ export default function CommunityPage() {
   const [newPost, setNewPost] = useState('');
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [replyText, setReplyText] = useState('');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -217,9 +240,30 @@ export default function CommunityPage() {
       content: newPost.trim(),
       likes: 0,
       liked: false,
+      replies: [],
     };
     setPosts(p => [post, ...p]);
     setNewPost('');
+  };
+
+  const handleReply = (postId: number) => {
+    if (!replyText.trim()) return;
+    const reply: Reply = {
+      id: Date.now(),
+      author: user?.displayName || 'あなた',
+      avatar: '🕊️',
+      time: 'たった今',
+      content: replyText.trim(),
+    };
+    setPosts(prev =>
+      prev.map(post =>
+        post.id === postId
+          ? { ...post, replies: [...post.replies, reply] }
+          : post
+      )
+    );
+    setReplyText('');
+    setReplyingTo(null);
   };
 
   const isLoggedIn = !authLoading && !!user;
@@ -592,10 +636,13 @@ export default function CommunityPage() {
                   {post.content}
                 </p>
 
-                {/* いいねボタン */}
+                {/* アクションボタン */}
                 <div style={{
                   paddingTop: '12px',
                   borderTop: '1px solid rgba(255,255,255,0.05)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
                 }}>
                   <button
                     onClick={() => handleLike(post.id)}
@@ -617,7 +664,192 @@ export default function CommunityPage() {
                     <span style={{ fontSize: '14px' }}>{post.liked ? '❤️' : '🤍'}</span>
                     <span>{post.likes}</span>
                   </button>
+                  {isLoggedIn && (
+                    <button
+                      onClick={() => {
+                        setReplyingTo(replyingTo === post.id ? null : post.id);
+                        setReplyText('');
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '8px 16px',
+                        background: replyingTo === post.id ? 'rgba(255,224,130,0.08)' : 'transparent',
+                        border: replyingTo === post.id ? '1px solid rgba(255,224,130,0.15)' : '1px solid transparent',
+                        borderRadius: '20px',
+                        fontSize: '13px',
+                        color: replyingTo === post.id ? 'rgba(255,224,130,0.7)' : 'rgba(245,240,225,0.35)',
+                        cursor: 'pointer',
+                        fontWeight: '300',
+                        transition: 'all 0.3s',
+                        fontFamily: serif,
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                      </svg>
+                      <span>返信{post.replies.length > 0 ? ` ${post.replies.length}` : ''}</span>
+                    </button>
+                  )}
                 </div>
+
+                {/* 返信入力フォーム */}
+                {replyingTo === post.id && (
+                  <div style={{
+                    marginTop: '16px',
+                    paddingTop: '16px',
+                    borderTop: '1px solid rgba(255,255,255,0.04)',
+                  }}>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                      <div style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, rgba(255,224,130,0.2), rgba(255,255,255,0.04))',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '14px',
+                        flexShrink: 0,
+                        border: '1px solid rgba(255,224,130,0.1)',
+                      }}>
+                        🕊️
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <textarea
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          placeholder={`${post.author}さんに返信...`}
+                          autoFocus
+                          style={{
+                            width: '100%',
+                            minHeight: '60px',
+                            padding: '10px 14px',
+                            background: 'rgba(255,255,255,0.04)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            borderRadius: '10px',
+                            fontSize: '13px',
+                            fontWeight: '300',
+                            color: '#F5F0E1',
+                            resize: 'vertical',
+                            outline: 'none',
+                            fontFamily: serif,
+                            lineHeight: '1.7',
+                            boxSizing: 'border-box',
+                          }}
+                        />
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '8px' }}>
+                          <button
+                            onClick={() => { setReplyingTo(null); setReplyText(''); }}
+                            style={{
+                              padding: '7px 18px',
+                              background: 'transparent',
+                              color: 'rgba(245,240,225,0.4)',
+                              border: '1px solid rgba(255,255,255,0.06)',
+                              borderRadius: '16px',
+                              fontSize: '12px',
+                              fontWeight: '300',
+                              cursor: 'pointer',
+                              fontFamily: serif,
+                              transition: 'all 0.3s',
+                            }}
+                          >
+                            キャンセル
+                          </button>
+                          <button
+                            onClick={() => handleReply(post.id)}
+                            disabled={!replyText.trim()}
+                            style={{
+                              padding: '7px 20px',
+                              background: replyText.trim()
+                                ? 'linear-gradient(135deg, rgba(255,224,130,0.18), rgba(255,193,7,0.12))'
+                                : 'rgba(255,255,255,0.03)',
+                              color: replyText.trim() ? '#FFE082' : 'rgba(245,240,225,0.2)',
+                              border: replyText.trim() ? '1px solid rgba(255,224,130,0.2)' : '1px solid rgba(255,255,255,0.05)',
+                              borderRadius: '16px',
+                              fontSize: '12px',
+                              fontWeight: '400',
+                              cursor: replyText.trim() ? 'pointer' : 'not-allowed',
+                              fontFamily: serif,
+                              letterSpacing: '0.06em',
+                              transition: 'all 0.3s',
+                            }}
+                          >
+                            返信する
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 返信一覧 */}
+                {post.replies.length > 0 && (
+                  <div style={{
+                    marginTop: '16px',
+                    paddingTop: '12px',
+                    borderTop: '1px solid rgba(255,255,255,0.04)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                  }}>
+                    {post.replies.map(reply => (
+                      <div
+                        key={reply.id}
+                        style={{
+                          marginLeft: '20px',
+                          paddingLeft: '16px',
+                          borderLeft: '2px solid rgba(255,224,130,0.12)',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <div style={{
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '50%',
+                            background: 'linear-gradient(135deg, rgba(255,224,130,0.12), rgba(255,255,255,0.03))',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '13px',
+                            border: '1px solid rgba(255,255,255,0.06)',
+                            flexShrink: 0,
+                          }}>
+                            {reply.avatar}
+                          </div>
+                          <span style={{
+                            fontSize: '12px',
+                            fontWeight: '400',
+                            color: 'rgba(245,240,225,0.7)',
+                            fontFamily: serif,
+                            letterSpacing: '0.04em',
+                          }}>
+                            {reply.author}
+                          </span>
+                          <span style={{
+                            fontSize: '10px',
+                            color: 'rgba(245,240,225,0.3)',
+                            fontWeight: '300',
+                          }}>
+                            {reply.time}
+                          </span>
+                        </div>
+                        <p style={{
+                          fontSize: '13px',
+                          color: 'rgba(245,240,225,0.7)',
+                          lineHeight: '1.8',
+                          fontWeight: '300',
+                          fontFamily: serif,
+                          letterSpacing: '0.02em',
+                          margin: 0,
+                        }}>
+                          {reply.content}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
