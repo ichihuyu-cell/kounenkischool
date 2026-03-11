@@ -329,36 +329,39 @@ export default function Home() {
             </div>
 
             {/* 特徴3 */}
-            <div style={{
-              background: '#FFFFFF',
-              borderRadius: '12px',
-              padding: '40px',
-              border: '1px solid #F0F0F0',
-              textAlign: 'center',
-              transition: 'transform 0.3s'
-            }}>
+            <Link href="/community" style={{ textDecoration: 'none', color: 'inherit' }}>
               <div style={{
-                fontSize: '40px',
-                marginBottom: '20px'
-              }}>💬</div>
-              <h3 style={{
-                fontSize: '20px',
-                color: '#2C3E5F',
-                fontWeight: '300',
-                marginBottom: '16px',
-                letterSpacing: '0.05em'
+                background: '#FFFFFF',
+                borderRadius: '12px',
+                padding: '40px',
+                border: '1px solid #F0F0F0',
+                textAlign: 'center',
+                transition: 'transform 0.3s',
+                cursor: 'pointer',
               }}>
-                仲間とつながる
-              </h3>
-              <p style={{
-                fontSize: '14px',
-                color: '#4A4A4A',
-                lineHeight: '1.8',
-                fontWeight: '300'
-              }}>
-                同じ経験をしている人たちと情報を共有し、励まし合えます。
-              </p>
-            </div>
+                <div style={{
+                  fontSize: '40px',
+                  marginBottom: '20px'
+                }}>💬</div>
+                <h3 style={{
+                  fontSize: '20px',
+                  color: '#2C3E5F',
+                  fontWeight: '300',
+                  marginBottom: '16px',
+                  letterSpacing: '0.05em'
+                }}>
+                  仲間とつながる
+                </h3>
+                <p style={{
+                  fontSize: '14px',
+                  color: '#4A4A4A',
+                  lineHeight: '1.8',
+                  fontWeight: '300'
+                }}>
+                  同じ経験をしている人たちと情報を共有し、励まし合えます。
+                </p>
+              </div>
+            </Link>
           </div>
         </section>
 
