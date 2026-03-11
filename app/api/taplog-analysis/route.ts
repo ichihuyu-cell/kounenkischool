@@ -100,7 +100,16 @@ ${summary}
 
 ※医療的な診断ではなく、記録データに基づく傾向分析として回答してください。温かく寄り添うトーンでお願いします。`;
 
-    const client = new Anthropic();
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      console.error('AI Analysis error: ANTHROPIC_API_KEY is not set');
+      return NextResponse.json(
+        { error: 'APIキーが設定されていません。' },
+        { status: 500, headers }
+      );
+    }
+
+    const client = new Anthropic({ apiKey });
 
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
@@ -115,6 +124,13 @@ ${summary}
       { headers }
     );
   } catch (e: unknown) {
+    if (e instanceof Anthropic.APIError) {
+      console.error('AI Analysis API error:', e.status, e.message, e.error);
+      return NextResponse.json(
+        { error: `AI分析でエラーが発生しました（${e.status}）。しばらくしてから再度お試しください。` },
+        { status: 500, headers }
+      );
+    }
     const message = e instanceof Error ? e.message : 'Unknown error';
     console.error('AI Analysis error:', message);
     return NextResponse.json(
