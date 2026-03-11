@@ -22,18 +22,39 @@ export default function LoginPage() {
     e.preventDefault();
     setResetError('');
     setResetMessage('');
+
+    if (!resetEmail.trim()) {
+      setResetError('メールアドレスを入力してください。');
+      return;
+    }
+
     setResetLoading(true);
 
     try {
       await sendPasswordResetEmail(auth, resetEmail);
       setResetMessage('パスワードリセットメールを送信しました。メールをご確認ください。');
     } catch (err: any) {
-      if (err.code === 'auth/user-not-found') {
-        setResetError('このメールアドレスのアカウントは見つかりませんでした。');
-      } else if (err.code === 'auth/invalid-email') {
-        setResetError('メールアドレスの形式が正しくありません。');
-      } else {
-        setResetError('メールの送信に失敗しました。もう一度お試しください。');
+      console.error('Password reset error:', err.code, err.message);
+      switch (err.code) {
+        case 'auth/user-not-found':
+          // Email Enumeration Protection有効時はこのエラーは発生しない
+          setResetError('このメールアドレスのアカウントは見つかりませんでした。');
+          break;
+        case 'auth/invalid-email':
+          setResetError('メールアドレスの形式が正しくありません。');
+          break;
+        case 'auth/too-many-requests':
+          setResetError('リクエストが多すぎます。しばらく時間をおいてから再度お試しください。');
+          break;
+        case 'auth/network-request-failed':
+          setResetError('ネットワークエラーが発生しました。インターネット接続を確認してください。');
+          break;
+        case 'auth/missing-email':
+          setResetError('メールアドレスを入力してください。');
+          break;
+        default:
+          setResetError(`メールの送信に失敗しました（${err.code || '不明なエラー'}）。もう一度お試しください。`);
+          break;
       }
     } finally {
       setResetLoading(false);
