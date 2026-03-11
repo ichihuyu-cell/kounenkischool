@@ -265,36 +265,39 @@ export default function Home() {
             gap: '40px'
           }}>
             {/* 特徴1 */}
-            <div style={{
-              background: '#FFFFFF',
-              borderRadius: '12px',
-              padding: '40px',
-              border: '1px solid #F0F0F0',
-              textAlign: 'center',
-              transition: 'transform 0.3s'
-            }}>
+            <a href="https://taplog-pink.vercel.app" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
               <div style={{
-                fontSize: '40px',
-                marginBottom: '20px'
-              }}>📊</div>
-              <h3 style={{
-                fontSize: '20px',
-                color: '#2C3E5F',
-                fontWeight: '300',
-                marginBottom: '16px',
-                letterSpacing: '0.05em'
+                background: '#FFFFFF',
+                borderRadius: '12px',
+                padding: '40px',
+                border: '1px solid #F0F0F0',
+                textAlign: 'center',
+                transition: 'transform 0.3s',
+                cursor: 'pointer',
               }}>
-                揺らぎを記録
-              </h3>
-              <p style={{
-                fontSize: '14px',
-                color: '#4A4A4A',
-                lineHeight: '1.8',
-                fontWeight: '300'
-              }}>
-                242種類の症状から選んで記録。あなただけのデータが蓄積されます。
-              </p>
-            </div>
+                <div style={{
+                  fontSize: '40px',
+                  marginBottom: '20px'
+                }}>📊</div>
+                <h3 style={{
+                  fontSize: '20px',
+                  color: '#2C3E5F',
+                  fontWeight: '300',
+                  marginBottom: '16px',
+                  letterSpacing: '0.05em'
+                }}>
+                  揺らぎを記録
+                </h3>
+                <p style={{
+                  fontSize: '14px',
+                  color: '#4A4A4A',
+                  lineHeight: '1.8',
+                  fontWeight: '300'
+                }}>
+                  242種類の症状から選んで記録。あなただけのデータが蓄積されます。
+                </p>
+              </div>
+            </a>
 
             {/* 特徴2 */}
             <div style={{
