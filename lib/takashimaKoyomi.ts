@@ -1,6 +1,52 @@
 // 高島暦データベース
 
-export const rokuyo = ['大安', '赤口', '先勝', '友引', '先負', '仏滅'];
+// 六曜: (旧暦月 + 旧暦日) % 6 のインデックス順
+export const rokuyo = ['先勝', '友引', '先負', '仏滅', '大安', '赤口'];
+
+// 旧暦の朔日（新月=旧暦1日）テーブル（2025年1月〜2027年12月）
+// 各エントリは [西暦年, 西暦月, 西暦日, 旧暦月] を表す
+const lunarNewMoons: [number, number, number, number][] = [
+  // 2025年
+  [2025, 1, 29, 1],  [2025, 2, 28, 2],  [2025, 3, 29, 3],  [2025, 4, 27, 4],
+  [2025, 5, 27, 5],  [2025, 6, 25, 6],  [2025, 7, 25, 6.5], // 閏6月
+  [2025, 8, 23, 7],  [2025, 9, 22, 8],  [2025, 10, 21, 9], [2025, 11, 20, 10],
+  [2025, 12, 20, 11],
+  // 2026年
+  [2026, 1, 18, 12], [2026, 2, 17, 1],  [2026, 3, 19, 2],  [2026, 4, 17, 3],
+  [2026, 5, 17, 4],  [2026, 6, 15, 5],  [2026, 7, 14, 6],  [2026, 8, 13, 7],
+  [2026, 9, 11, 8],  [2026, 10, 10, 9], [2026, 11, 9, 10], [2026, 12, 9, 11],
+  // 2027年
+  [2027, 1, 7, 12],  [2027, 2, 6, 1],   [2027, 3, 8, 2],   [2027, 4, 6, 3],
+  [2027, 5, 6, 4],   [2027, 6, 4, 5],   [2027, 7, 4, 6],   [2027, 8, 2, 7],
+  [2027, 9, 1, 8],   [2027, 10, 1, 9],  [2027, 10, 30, 10], [2027, 11, 29, 11],
+  [2027, 12, 29, 12],
+];
+
+// 新暦→旧暦変換
+function solarToLunar(year: number, month: number, day: number): { lunarMonth: number; lunarDay: number } {
+  const targetDate = new Date(year, month - 1, day);
+  const targetTime = targetDate.getTime();
+
+  // 対象日以前で最も近い朔日を見つける
+  let bestIndex = 0;
+  for (let i = 0; i < lunarNewMoons.length; i++) {
+    const [sy, sm, sd] = lunarNewMoons[i];
+    const nmDate = new Date(sy, sm - 1, sd);
+    if (nmDate.getTime() <= targetTime) {
+      bestIndex = i;
+    } else {
+      break;
+    }
+  }
+
+  const [sy, sm, sd, lm] = lunarNewMoons[bestIndex];
+  const nmDate = new Date(sy, sm - 1, sd);
+  const diffDays = Math.round((targetTime - nmDate.getTime()) / (1000 * 60 * 60 * 24));
+  const lunarDay = diffDays + 1;
+  const lunarMonth = Math.floor(lm); // 閏月(6.5等)は整数部を使う
+
+  return { lunarMonth, lunarDay };
+}
 
 export const juniChoku = {
   '建': { name: '建', fortune: '◎', good: ['開店', '移転', '旅行', '新規事業'], bad: ['土木工事'] },
@@ -17,12 +63,15 @@ export const juniChoku = {
   '閉': { name: '閉', fortune: '×', good: ['金銭収納', '墓作り'], bad: ['開店', '婚礼', '旅行'] }
 };
 
+export function getRokuyoByDate(year: number, month: number, day: number): string {
+  const { lunarMonth, lunarDay } = solarToLunar(year, month, day);
+  const index = (lunarMonth + lunarDay) % 6;
+  return rokuyo[index];
+}
+
 export function getTodayRokuyo(): string {
   const today = new Date();
-  const month = today.getMonth() + 1;
-  const day = today.getDate();
-  const index = (month + day) % 6;
-  return rokuyo[index];
+  return getRokuyoByDate(today.getFullYear(), today.getMonth() + 1, today.getDate());
 }
 
 export function getRokuyoInfo(rokuyoName: string) {

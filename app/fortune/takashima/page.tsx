@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Header from '../../components/Header';
-import { getTodayRokuyo, getRokuyoInfo, getTodayJuniChoku, juniChoku, checkPurpose, getOverallFortune } from '../../../lib/takashimaKoyomi';
+import { getTodayRokuyo, getRokuyoByDate, getRokuyoInfo, getTodayJuniChoku, juniChoku, checkPurpose, getOverallFortune } from '../../../lib/takashimaKoyomi';
 
 export default function TakashimaPage() {
   const [selectedPurpose, setSelectedPurpose] = useState('');
@@ -38,8 +38,7 @@ export default function TakashimaPage() {
     const calendar = [];
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
-      const rokuyoIndex = (month + 1 + day) % 6;
-      const rokuyoName = ['大安', '赤口', '先勝', '友引', '先負', '仏滅'][rokuyoIndex];
+      const rokuyoName = getRokuyoByDate(year, month + 1, day);
       const isToday = day === today.getDate();
       const isLucky = rokuyoName === '大安' || rokuyoName === '友引';
       
