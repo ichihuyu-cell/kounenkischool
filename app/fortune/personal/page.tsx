@@ -216,6 +216,15 @@ export default function PersonalReportPage() {
               <div style={{ fontSize: '60px', marginBottom: '16px' }}>
                 {<Image src={typeData.icon} alt={typeData.name} width={80} height={80} style={{marginBottom: '12px'}}/>}
               </div>
+              <p style={{
+                fontSize: '14px',
+                opacity: 0.7,
+                fontWeight: '300',
+                marginBottom: '4px',
+                letterSpacing: '0.08em'
+              }}>
+                あなたの心に咲く花、それは
+              </p>
               <h2 style={{
                 fontSize: '28px',
                 fontWeight: '300',
