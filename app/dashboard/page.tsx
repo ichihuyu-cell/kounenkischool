@@ -123,26 +123,22 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* ラッキー通知 - 金運の日 */}
+        {/* このサイトについて */}
         {todayLucky.isMoneyDay && !todayLucky.isLuckyDay && (
-          <div style={{
+          <Link href="/about" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
             background: 'linear-gradient(135deg, #FFF4CC 0%, #ffe9a3 100%)',
             borderRadius: '12px',
             padding: '28px 32px',
             marginBottom: '32px',
-            border: '2px solid #2C3E5F',
-            boxShadow: '0 4px 16px rgba(255, 244, 204, 0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '20px',
+            border: '1px solid #FFF4CC',
+            textDecoration: 'none',
+            color: '#2C3E5F',
             flexWrap: 'wrap'
           }}>
-            <div style={{
-              fontSize: '48px',
-              animation: 'pulse 2s infinite'
-            }}>
-              💰
-            </div>
+            <div style={{ fontSize: '48px' }}>🕊️</div>
             <div style={{ flex: 1 }}>
               <h3 style={{
                 fontSize: '20px',
@@ -151,7 +147,7 @@ export default function DashboardPage() {
                 marginBottom: '8px',
                 letterSpacing: '0.05em'
               }}>
-                今日は金運の良い日です
+                このサイトについて
               </h3>
               <p style={{
                 fontSize: '14px',
@@ -159,22 +155,10 @@ export default function DashboardPage() {
                 fontWeight: '300',
                 lineHeight: '1.6'
               }}>
-                {todayLucky.message}
+                想いを知る
               </p>
             </div>
-            <Link href="/fortune" style={{
-              padding: '12px 24px',
-              background: '#2C3E5F',
-              color: '#FFFFFF',
-              borderRadius: '20px',
-              fontSize: '13px',
-              fontWeight: '300',
-              textDecoration: 'none',
-              letterSpacing: '0.03em'
-            }}>
-              詳しく見る
-            </Link>
-          </div>
+          </Link>
         )}
 
         {/* ラッキー通知 - 通常 */}
@@ -257,18 +241,19 @@ export default function DashboardPage() {
             <div style={{ fontSize: '13px', opacity: 0.8, marginTop: '8px', fontWeight: '300' }}>仲間とつながる</div>
           </Link>
 
-          <Link href="/about" style={{
+          <Link href="/fortune" style={{
             background: 'linear-gradient(135deg, #FFF4CC 0%, #ffe9a3 100%)',
             borderRadius: '12px',
             padding: '40px 32px',
             textDecoration: 'none',
             color: '#2C3E5F',
             transition: 'transform 0.3s, box-shadow 0.3s',
-            border: '1px solid #FFF4CC'
+            border: '2px solid #2C3E5F',
+            boxShadow: '0 4px 16px rgba(255, 244, 204, 0.4)'
           }}>
-            <div style={{ fontSize: '32px', marginBottom: '16px' }}>🕊️</div>
-            <div style={{ fontSize: '18px', fontWeight: '300', letterSpacing: '0.05em' }}>このサイトについて</div>
-            <div style={{ fontSize: '13px', opacity: 0.8, marginTop: '8px', fontWeight: '300' }}>想いを知る</div>
+            <div style={{ fontSize: '32px', marginBottom: '16px' }}>💰</div>
+            <div style={{ fontSize: '18px', fontWeight: '300', letterSpacing: '0.05em' }}>今日は金運の良い日です</div>
+            <div style={{ fontSize: '13px', opacity: 0.8, marginTop: '8px', fontWeight: '300' }}>詳しく見る</div>
           </Link>
         </div>
 
