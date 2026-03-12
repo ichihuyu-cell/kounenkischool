@@ -3,93 +3,40 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '../../lib/firebase';
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  doc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  query,
+  orderBy,
+  Timestamp,
+} from 'firebase/firestore';
+import { auth, db } from '../../lib/firebase';
 import Header from '../components/Header';
 
 interface Reply {
-  id: number;
+  id: string;
   author: string;
-  avatar: string;
-  time: string;
+  authorId: string;
   content: string;
+  createdAt: Timestamp | null;
 }
 
 interface Post {
-  id: number;
+  id: string;
   author: string;
-  avatar: string;
-  time: string;
+  authorId: string;
   content: string;
   likes: number;
-  liked: boolean;
+  likedBy: string[];
   tag?: string;
   replies: Reply[];
+  createdAt: Timestamp | null;
 }
-
-const DUMMY_POSTS: Post[] = [
-  {
-    id: 1,
-    author: 'さくら',
-    avatar: '🌸',
-    time: '2時間前',
-    content: '今日は朝からほてりがひどかったけど、冷たいタオルを首に巻いたら少し楽になりました。小さな工夫の積み重ねが大事ですね。みなさんの対処法も聞きたいです。',
-    likes: 12,
-    liked: false,
-    tag: 'からだの揺らぎ',
-    replies: [
-      { id: 101, author: 'ゆき', avatar: '❄️', time: '1時間前', content: '私も冷たいタオル試してみます！首の後ろを冷やすのが良いと聞きました。' },
-    ],
-  },
-  {
-    id: 2,
-    author: 'ゆき',
-    avatar: '❄️',
-    time: '5時間前',
-    content: '久しぶりに朝から体が軽くて、近所を散歩できました。こういう日があるから頑張れる。調子が良い日は自分をたくさん褒めてあげようと思います',
-    likes: 28,
-    liked: false,
-    tag: 'こころの揺らぎ',
-    replies: [],
-  },
-  {
-    id: 3,
-    author: 'はな',
-    avatar: '🌷',
-    time: '昨日',
-    content: '新月の前後はいつも眠りが浅くなる気がします。RUNEERAで記録をつけ始めてから、自分のパターンが見えてきました。「なぜか辛い」が「この時期だから」に変わるだけで少し安心します。',
-    likes: 35,
-    liked: false,
-    tag: '月と暮らし',
-    replies: [
-      { id: 102, author: 'みき', avatar: '🍀', time: '20時間前', content: '私も新月前後は調子が悪くなります。パターンが分かるだけで気持ちが楽になりますよね。' },
-      { id: 103, author: 'さくら', avatar: '🌸', time: '18時間前', content: '「なぜか辛い」が「この時期だから」に変わる、すごく共感します。記録って大事ですね。' },
-    ],
-  },
-  {
-    id: 4,
-    author: 'みき',
-    avatar: '🍀',
-    time: '2日前',
-    content: 'イライラが止まらない日が続いていたけど、ここで皆さんの投稿を読んで「ひとりじゃない」って思えました。ありがとうございます。今日はハーブティーを飲んでゆっくりします。',
-    likes: 42,
-    liked: false,
-    tag: 'こころの揺らぎ',
-    replies: [],
-  },
-  {
-    id: 5,
-    author: 'りん',
-    avatar: '🔔',
-    time: '3日前',
-    content: '肩こりと頭痛がセットで来るのが辛い…。整体に行ったら少し楽になりました。週1のご褒美タイムとして続けてみようと思います。自分を大切にする時間、大事ですよね。',
-    likes: 19,
-    liked: false,
-    tag: 'からだの揺らぎ',
-    replies: [
-      { id: 104, author: 'はな', avatar: '🌷', time: '2日前', content: '整体いいですよね。私もご褒美タイムとして月2で通っています。自分を労わる時間、大切にしましょう。' },
-    ],
-  },
-];
 
 /* CSS三角形で針葉樹を作るヘルパー */
 function TreeSilhouette({ side }: { side: 'left' | 'right' }) {
@@ -204,13 +151,30 @@ function TreeSilhouette({ side }: { side: 'left' | 'right' }) {
   );
 }
 
+function formatTime(timestamp: Timestamp | null): string {
+  if (!timestamp) return '';
+  const now = Date.now();
+  const diff = now - timestamp.toMillis();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return 'たった今';
+  if (minutes < 60) return `${minutes}分前`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}時間前`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}日前`;
+  const d = timestamp.toDate();
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
 export default function CommunityPage() {
-  const [posts, setPosts] = useState<Post[]>(DUMMY_POSTS);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [newPost, setNewPost] = useState('');
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
+  const [posting, setPosting] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -220,48 +184,64 @@ export default function CommunityPage() {
     return () => unsubscribe();
   }, []);
 
-  const handleLike = (id: number) => {
-    setPosts(prev =>
-      prev.map(post =>
-        post.id === id
-          ? { ...post, liked: !post.liked, likes: post.liked ? post.likes - 1 : post.likes + 1 }
-          : post
-      )
-    );
+  // Firestoreからリアルタイムで投稿を取得
+  useEffect(() => {
+    const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const postsData: Post[] = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Post[];
+      setPosts(postsData);
+      setPostsLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLike = async (postId: string) => {
+    if (!user) return;
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
+    const postRef = doc(db, 'posts', postId);
+    const alreadyLiked = post.likedBy?.includes(user.uid);
+    await updateDoc(postRef, {
+      likes: alreadyLiked ? post.likes - 1 : post.likes + 1,
+      likedBy: alreadyLiked ? arrayRemove(user.uid) : arrayUnion(user.uid),
+    });
   };
 
-  const handlePost = () => {
-    if (!newPost.trim()) return;
-    const post: Post = {
-      id: Date.now(),
-      author: user?.displayName || 'あなた',
-      avatar: '🕊️',
-      time: 'たった今',
-      content: newPost.trim(),
-      likes: 0,
-      liked: false,
-      replies: [],
-    };
-    setPosts(p => [post, ...p]);
-    setNewPost('');
+  const handlePost = async () => {
+    if (!newPost.trim() || !user) return;
+    setPosting(true);
+    try {
+      await addDoc(collection(db, 'posts'), {
+        author: user.displayName || 'ゲスト',
+        authorId: user.uid,
+        content: newPost.trim(),
+        likes: 0,
+        likedBy: [],
+        replies: [],
+        createdAt: Timestamp.now(),
+      });
+      setNewPost('');
+    } finally {
+      setPosting(false);
+    }
   };
 
-  const handleReply = (postId: number) => {
-    if (!replyText.trim()) return;
+  const handleReply = async (postId: string) => {
+    if (!replyText.trim() || !user) return;
+    const postRef = doc(db, 'posts', postId);
     const reply: Reply = {
-      id: Date.now(),
-      author: user?.displayName || 'あなた',
-      avatar: '🕊️',
-      time: 'たった今',
+      id: `${Date.now()}_${user.uid}`,
+      author: user.displayName || 'ゲスト',
+      authorId: user.uid,
       content: replyText.trim(),
+      createdAt: Timestamp.now(),
     };
-    setPosts(prev =>
-      prev.map(post =>
-        post.id === postId
-          ? { ...post, replies: [...post.replies, reply] }
-          : post
-      )
-    );
+    await updateDoc(postRef, {
+      replies: arrayUnion(reply),
+    });
     setReplyText('');
     setReplyingTo(null);
   };
@@ -477,7 +457,7 @@ export default function CommunityPage() {
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
                     <button
                       onClick={handlePost}
-                      disabled={!newPost.trim()}
+                      disabled={!newPost.trim() || posting}
                       style={{
                         padding: '10px 28px',
                         background: newPost.trim()
@@ -494,7 +474,7 @@ export default function CommunityPage() {
                         transition: 'all 0.3s',
                       }}
                     >
-                      投稿する
+                      {posting ? '投稿中...' : '投稿する'}
                     </button>
                   </div>
                 </div>
@@ -556,6 +536,19 @@ export default function CommunityPage() {
           )}
 
           {/* ── 投稿一覧 ── */}
+          {postsLoading ? (
+            <div style={{ textAlign: 'center', padding: '40px 0' }}>
+              <p style={{ color: 'rgba(245,240,225,0.4)', fontSize: '14px', fontWeight: '300', fontFamily: serif }}>
+                投稿を読み込み中...
+              </p>
+            </div>
+          ) : posts.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 0' }}>
+              <p style={{ color: 'rgba(245,240,225,0.4)', fontSize: '14px', fontWeight: '300', fontFamily: serif }}>
+                まだ投稿がありません。最初の一歩を踏み出してみませんか？
+              </p>
+            </div>
+          ) : null}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {posts.map(post => (
               <div
@@ -584,7 +577,7 @@ export default function CommunityPage() {
                     border: '1px solid rgba(255,255,255,0.1)',
                     flexShrink: 0,
                   }}>
-                    {post.avatar}
+                    🕊️
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{
@@ -602,7 +595,7 @@ export default function CommunityPage() {
                       fontWeight: '300',
                       marginTop: '3px',
                     }}>
-                      {post.time}
+                      {formatTime(post.createdAt)}
                     </div>
                   </div>
                   {post.tag && (
@@ -644,26 +637,32 @@ export default function CommunityPage() {
                   alignItems: 'center',
                   gap: '8px',
                 }}>
-                  <button
-                    onClick={() => handleLike(post.id)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      padding: '8px 16px',
-                      background: post.liked ? 'rgba(255,182,193,0.1)' : 'transparent',
-                      border: post.liked ? '1px solid rgba(255,182,193,0.18)' : '1px solid transparent',
-                      borderRadius: '20px',
-                      fontSize: '13px',
-                      color: post.liked ? '#FFB6C1' : 'rgba(245,240,225,0.35)',
-                      cursor: 'pointer',
-                      fontWeight: '300',
-                      transition: 'all 0.3s',
-                    }}
-                  >
-                    <span style={{ fontSize: '14px' }}>{post.liked ? '❤️' : '🤍'}</span>
-                    <span>{post.likes}</span>
-                  </button>
+                  {(() => {
+                    const liked = user ? post.likedBy?.includes(user.uid) : false;
+                    return (
+                      <button
+                        onClick={() => handleLike(post.id)}
+                        disabled={!user}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '8px 16px',
+                          background: liked ? 'rgba(255,182,193,0.1)' : 'transparent',
+                          border: liked ? '1px solid rgba(255,182,193,0.18)' : '1px solid transparent',
+                          borderRadius: '20px',
+                          fontSize: '13px',
+                          color: liked ? '#FFB6C1' : 'rgba(245,240,225,0.35)',
+                          cursor: user ? 'pointer' : 'default',
+                          fontWeight: '300',
+                          transition: 'all 0.3s',
+                        }}
+                      >
+                        <span style={{ fontSize: '14px' }}>{liked ? '❤️' : '🤍'}</span>
+                        <span>{post.likes}</span>
+                      </button>
+                    );
+                  })()}
                   {isLoggedIn && (
                     <button
                       onClick={() => {
@@ -816,7 +815,7 @@ export default function CommunityPage() {
                             border: '1px solid rgba(255,255,255,0.06)',
                             flexShrink: 0,
                           }}>
-                            {reply.avatar}
+                            🕊️
                           </div>
                           <span style={{
                             fontSize: '12px',
@@ -832,7 +831,7 @@ export default function CommunityPage() {
                             color: 'rgba(245,240,225,0.3)',
                             fontWeight: '300',
                           }}>
-                            {reply.time}
+                            {formatTime(reply.createdAt)}
                           </span>
                         </div>
                         <p style={{
