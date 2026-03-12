@@ -229,7 +229,7 @@ export default function DashboardPage() {
           gap: '24px',
           marginBottom: '48px'
         }}>
-          <Link href="/record" style={{
+          <a href="https://taplog-pink.vercel.app" target="_blank" rel="noopener noreferrer" style={{
             background: 'linear-gradient(135deg, #2C3E5F 0%, #3d5278 100%)',
             borderRadius: '12px',
             padding: '40px 32px',
@@ -239,9 +239,9 @@ export default function DashboardPage() {
             border: '1px solid #2C3E5F'
           }}>
             <div style={{ fontSize: '32px', marginBottom: '16px' }}>📝</div>
-            <div style={{ fontSize: '18px', fontWeight: '300', letterSpacing: '0.05em' }}>更年期クラッカー</div>
+            <div style={{ fontSize: '18px', fontWeight: '300', letterSpacing: '0.05em' }}>Threeタップログ</div>
             <div style={{ fontSize: '13px', opacity: 0.9, marginTop: '8px', fontWeight: '300' }}>揺らぎを記録する</div>
-          </Link>
+          </a>
 
           <Link href="/community" style={{
             background: '#F0F0F0',
