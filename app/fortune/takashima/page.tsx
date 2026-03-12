@@ -59,6 +59,18 @@ export default function TakashimaPage() {
   const today = new Date();
   const monthName = `${today.getFullYear()}年${today.getMonth() + 1}月`;
 
+  // 和暦変換
+  const getWareki = () => {
+    const year = today.getFullYear();
+    const reiwaYear = year - 2018;
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    const dayOfWeekNames = ['日', '月', '火', '水', '木', '金', '土'];
+    const dayOfWeek = dayOfWeekNames[today.getDay()];
+    return `令和${reiwaYear}年${month}月${day}日（${dayOfWeek}）`;
+  };
+  const warekiDate = getWareki();
+
   return (
     <div style={{ minHeight: '100vh', background: '#FFFFFF' }}>
       <Header />
@@ -67,7 +79,10 @@ export default function TakashimaPage() {
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
           <Link href="/fortune" style={{ display: 'inline-block', fontSize: '13px', color: '#4A4A4A', textDecoration: 'none', marginBottom: '16px', fontWeight: '300' }}>← 占いトップへ戻る</Link>
           <h1 style={{ fontSize: '36px', color: '#2C3E5F', fontWeight: '300', marginBottom: '12px', letterSpacing: '0.1em' }}>高島暦 📖</h1>
-          <p style={{ fontSize: '15px', color: '#4A4A4A', fontWeight: '300' }}>古からの知恵が示す、吉日と凶日</p>
+          <p style={{ fontSize: '15px', color: '#4A4A4A', fontWeight: '300', marginBottom: '20px' }}>古からの知恵が示す、吉日と凶日</p>
+          <div style={{ fontSize: '28px', color: '#2C3E5F', fontWeight: '400', letterSpacing: '0.15em', padding: '16px 32px', background: 'linear-gradient(135deg, #FFF4CC 0%, #FFE5A0 100%)', borderRadius: '12px', display: 'inline-block', border: '2px solid #2C3E5F' }}>
+            {warekiDate}
+          </div>
         </div>
 
         <div style={{ background: 'linear-gradient(135deg, #2C3E5F 0%, #3d5278 100%)', borderRadius: '16px', padding: '40px', marginBottom: '40px', color: '#FFFFFF' }}>
