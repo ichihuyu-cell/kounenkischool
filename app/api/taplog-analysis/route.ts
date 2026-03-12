@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
       return `${date}: 体調=${cond}, 症状=[${syms}], 要因=[${facs}]`;
     }).join('\n');
 
-    const prompt = `以下は更年期の体調記録データです。このデータを分析して、以下の形式で日本語で回答してください。
+    const prompt = `以下は体の揺らぎ・体調変化の記録データです。このデータを分析して、以下の形式で日本語で回答してください。
 
 【分析データ】
 ${summary}
@@ -136,8 +136,16 @@ ${summary}
   } catch (e: unknown) {
     if (e instanceof Anthropic.APIError) {
       console.error('AI Analysis API error:', e.status, e.message, JSON.stringify(e.error));
+      let userMessage = `AI分析でエラーが発生しました（${e.status}）。しばらくしてから再度お試しください。`;
+      if (e.status === 401) {
+        userMessage = 'APIキーが無効です。管理者にお問い合わせください。';
+      } else if (e.status === 429) {
+        userMessage = 'リクエストが集中しています。しばらくしてから再度お試しください。';
+      } else if (e.message.includes('credit balance')) {
+        userMessage = 'AI分析サービスは現在メンテナンス中です。しばらくしてから再度お試しください。';
+      }
       return NextResponse.json(
-        { error: `AI分析でエラーが発生しました（${e.status}）。しばらくしてから再度お試しください。`, debug: `${e.status}: ${e.message}` },
+        { error: userMessage, debug: `${e.status}: ${e.message}` },
         { status: 500, headers }
       );
     }
