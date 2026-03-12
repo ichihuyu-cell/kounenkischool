@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Header from '../../components/Header';
-import { getTodayRokuyo, getRokuyoByDate, getRokuyoInfo, getTodayJuniChoku, juniChoku, checkPurpose, getOverallFortune } from '../../../lib/takashimaKoyomi';
+import { getTodayRokuyo, getRokuyoByDate, getRokuyoInfo, getTodayJuniChoku, juniChoku, getJuniChokuByDate, getTodayNijuhassuku, nijuhassuku, checkPurpose, getOverallFortune } from '../../../lib/takashimaKoyomi';
 
 export default function TakashimaPage() {
   const [selectedPurpose, setSelectedPurpose] = useState('');
@@ -12,6 +12,8 @@ export default function TakashimaPage() {
   const rokuyoInfo = getRokuyoInfo(todayRokuyo);
   const todayChoku = getTodayJuniChoku();
   const chokuInfo = juniChoku[todayChoku as keyof typeof juniChoku];
+  const todaySuku = getTodayNijuhassuku();
+  const sukuInfo = nijuhassuku[todaySuku as keyof typeof nijuhassuku];
   const overallFortune = getOverallFortune(todayRokuyo, todayChoku);
 
   const purposes = [
@@ -71,19 +73,29 @@ export default function TakashimaPage() {
         <div style={{ background: 'linear-gradient(135deg, #2C3E5F 0%, #3d5278 100%)', borderRadius: '16px', padding: '40px', marginBottom: '40px', color: '#FFFFFF' }}>
           <h2 style={{ fontSize: '24px', fontWeight: '300', marginBottom: '32px', textAlign: 'center', letterSpacing: '0.1em' }}>今日の暦</h2>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
-            <div style={{ background: 'rgba(255, 244, 204, 0.15)', borderRadius: '12px', padding: '32px', textAlign: 'center' }}>
-              <div style={{ fontSize: '16px', marginBottom: '16px', opacity: 0.9, fontWeight: '300' }}>六曜</div>
-              <div style={{ fontSize: '48px', fontWeight: '400', marginBottom: '12px', letterSpacing: '0.05em' }}>{todayRokuyo}</div>
-              <div style={{ fontSize: '32px', marginBottom: '16px' }}>{rokuyoInfo.fortune}</div>
-              <div style={{ fontSize: '14px', opacity: 0.9, fontWeight: '300', lineHeight: '1.6' }}>{rokuyoInfo.description}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '32px' }}>
+            <div style={{ background: 'rgba(255, 244, 204, 0.15)', borderRadius: '12px', padding: '24px', textAlign: 'center' }}>
+              <div style={{ fontSize: '14px', marginBottom: '12px', opacity: 0.9, fontWeight: '300' }}>六曜</div>
+              <div style={{ fontSize: '40px', fontWeight: '400', marginBottom: '8px', letterSpacing: '0.05em' }}>{todayRokuyo}</div>
+              <div style={{ fontSize: '28px', marginBottom: '12px' }}>{rokuyoInfo.fortune}</div>
+              <div style={{ fontSize: '13px', opacity: 0.9, fontWeight: '300', lineHeight: '1.6' }}>{rokuyoInfo.description}</div>
             </div>
 
-            <div style={{ background: 'rgba(255, 255, 255, 0.15)', borderRadius: '12px', padding: '32px', textAlign: 'center' }}>
-              <div style={{ fontSize: '16px', marginBottom: '16px', opacity: 0.9, fontWeight: '300' }}>十二直</div>
-              <div style={{ fontSize: '48px', fontWeight: '400', marginBottom: '12px', letterSpacing: '0.05em' }}>{todayChoku}</div>
-              <div style={{ fontSize: '32px', marginBottom: '16px' }}>{chokuInfo.fortune}</div>
-              <div style={{ fontSize: '14px', opacity: 0.9, fontWeight: '300' }}>吉：{chokuInfo.good.join('、')}</div>
+            <div style={{ background: 'rgba(255, 255, 255, 0.15)', borderRadius: '12px', padding: '24px', textAlign: 'center' }}>
+              <div style={{ fontSize: '14px', marginBottom: '12px', opacity: 0.9, fontWeight: '300' }}>十二直（中段）</div>
+              <div style={{ fontSize: '40px', fontWeight: '400', marginBottom: '8px', letterSpacing: '0.05em' }}>{todayChoku}</div>
+              <div style={{ fontSize: '28px', marginBottom: '12px' }}>{chokuInfo.fortune}</div>
+              <div style={{ fontSize: '13px', opacity: 0.9, fontWeight: '300', lineHeight: '1.6' }}>
+                {chokuInfo.good.length > 0 && <span>吉：{chokuInfo.good.join('、')}</span>}
+                {chokuInfo.bad.length > 0 && <><br />凶：{chokuInfo.bad.join('、')}</>}
+              </div>
+            </div>
+
+            <div style={{ background: 'rgba(200, 220, 255, 0.15)', borderRadius: '12px', padding: '24px', textAlign: 'center' }}>
+              <div style={{ fontSize: '14px', marginBottom: '12px', opacity: 0.9, fontWeight: '300' }}>二十八宿</div>
+              <div style={{ fontSize: '40px', fontWeight: '400', marginBottom: '8px', letterSpacing: '0.05em' }}>{todaySuku}</div>
+              <div style={{ fontSize: '28px', marginBottom: '12px' }}>{sukuInfo.fortune}</div>
+              <div style={{ fontSize: '13px', opacity: 0.9, fontWeight: '300', lineHeight: '1.6' }}>{sukuInfo.meaning}</div>
             </div>
           </div>
 

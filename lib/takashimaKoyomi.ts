@@ -128,12 +128,84 @@ export function getRokuyoInfo(rokuyoName: string) {
   return info[rokuyoName] || info['大安'];
 }
 
+// ユリウス日（JDN）計算
+function getJDN(year: number, month: number, day: number): number {
+  const a = Math.floor((14 - month) / 12);
+  const y = year + 4800 - a;
+  const m = month + 12 * a - 3;
+  return day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+}
+
+// 十二直の計算（節月と日の組み合わせで決まる）
+// 基準日: 2026年1月1日 = JDN 2461408、この日の十二直を「建」(index=0)と仮定し調整
+const JUNI_CHOKU_BASE_JDN = 2461408; // 2026-01-01
+const JUNI_CHOKU_BASE_INDEX = 4; // 2026-01-01 の十二直インデックス（定）
+
+const juniChokuList = ['建', '除', '満', '平', '定', '執', '破', '危', '成', '納', '開', '閉'];
+
+export function getJuniChokuByDate(year: number, month: number, day: number): string {
+  const jdn = getJDN(year, month, day);
+  const diff = jdn - JUNI_CHOKU_BASE_JDN;
+  const index = ((diff % 12) + JUNI_CHOKU_BASE_INDEX) % 12;
+  const normalizedIndex = ((index % 12) + 12) % 12;
+  return juniChokuList[normalizedIndex];
+}
+
 export function getTodayJuniChoku() {
   const today = new Date();
-  const day = today.getDate();
-  const chokuList = Object.keys(juniChoku);
-  const index = day % chokuList.length;
-  return chokuList[index];
+  return getJuniChokuByDate(today.getFullYear(), today.getMonth() + 1, today.getDate());
+}
+
+// 二十八宿データ
+export const nijuhassuku: Record<string, { name: string; fortune: string; meaning: string; good: string[]; bad: string[] }> = {
+  '角': { name: '角', fortune: '吉', meaning: '万事に吉。衣類の裁断、柱立て、結婚に良い', good: ['結婚', '建築', '衣類裁断', '旅行'], bad: ['葬儀'] },
+  '亢': { name: '亢', fortune: '凶', meaning: '物事が強くなりすぎる日。控えめに', good: ['種まき', '収穫'], bad: ['婚礼', '建築', '旅行'] },
+  '氐': { name: '氐', fortune: '吉', meaning: '万事に吉。特に結婚、開店、種まきに良い', good: ['結婚', '開店', '種まき', '酒造り'], bad: ['水に関すること'] },
+  '房': { name: '房', fortune: '大吉', meaning: '何事にも大吉。特に結婚、旅行、移転に良い', good: ['結婚', '旅行', '移転', '開店', '建築'], bad: [] },
+  '心': { name: '心', fortune: '凶', meaning: '盗難に注意。神仏の祭祀のみ吉', good: ['祭祀', '神事'], bad: ['旅行', '建築', '結婚'] },
+  '尾': { name: '尾', fortune: '吉', meaning: '結婚、建築、開店に吉。事始めに良い', good: ['結婚', '建築', '開店', '移転'], bad: ['衣類裁断'] },
+  '箕': { name: '箕', fortune: '吉', meaning: '動土、池堀り、仕入れに吉。学問始めに良い', good: ['仕入れ', '動土', '学問始め', '酒造り'], bad: ['結婚', '葬儀'] },
+  '斗': { name: '斗', fortune: '吉', meaning: '土掘り、建築、開店に吉', good: ['建築', '開店', '動土', '造作'], bad: ['衣類裁断'] },
+  '牛': { name: '牛', fortune: '凶', meaning: '万事に慎むべき日。午前中のみ吉', good: ['午前中の行事'], bad: ['結婚', '旅行', '移転'] },
+  '女': { name: '女', fortune: '凶', meaning: '何事にも凶。葬儀、訴訟のみ可', good: ['葬儀'], bad: ['結婚', '建築', '旅行', '契約'] },
+  '虚': { name: '虚', fortune: '凶', meaning: '入学、習い事始めに吉。他は凶', good: ['入学', '習い事'], bad: ['結婚', '建築', '契約'] },
+  '危': { name: '危', fortune: '凶', meaning: '何事にも危険な日。壁塗り、酒造りのみ吉', good: ['壁塗り', '酒造り'], bad: ['結婚', '旅行', '建築', '高所作業'] },
+  '室': { name: '室', fortune: '吉', meaning: '結婚、旅行、建築、祈願に大吉', good: ['結婚', '旅行', '建築', '祈願', '祭祀'], bad: [] },
+  '壁': { name: '壁', fortune: '大吉', meaning: '開店、旅行、結婚、建築など万事に大吉', good: ['開店', '旅行', '結婚', '建築', '衣類裁断'], bad: [] },
+  '奎': { name: '奎', fortune: '大吉', meaning: '開店、建築、移転など万事に大吉', good: ['開店', '建築', '移転', '結婚', '旅行'], bad: [] },
+  '婁': { name: '婁', fortune: '吉', meaning: '動土、建築、種まきに吉', good: ['建築', '種まき', '動土', '結婚'], bad: [] },
+  '胃': { name: '胃', fortune: '吉', meaning: '開店、移転に吉。就職にも良い', good: ['開店', '移転', '就職', '求人'], bad: ['葬儀'] },
+  '昴': { name: '昴', fortune: '吉', meaning: '神仏への祈願、結婚に吉', good: ['祈願', '結婚', '開店'], bad: ['建築', '動土'] },
+  '畢': { name: '畢', fortune: '吉', meaning: '建築、農事に吉。契約にも良い', good: ['建築', '農事', '契約', '婚礼'], bad: ['旅行'] },
+  '觜': { name: '觜', fortune: '凶', meaning: '入学、習い事に吉。他は凶', good: ['入学', '習い事', '稽古始め'], bad: ['結婚', '建築', '旅行'] },
+  '参': { name: '参', fortune: '吉', meaning: '旅行、仕入れ、縁談に吉', good: ['旅行', '仕入れ', '結婚', '養子縁組'], bad: ['葬儀'] },
+  '井': { name: '井', fortune: '吉', meaning: '神仏の祈願、種まき、動土に吉', good: ['祈願', '種まき', '動土', '建築'], bad: ['衣類裁断'] },
+  '鬼': { name: '鬼', fortune: '大吉', meaning: '二十八宿中最大の吉日。万事大吉', good: ['結婚', '開店', '建築', '旅行', '契約', '移転'], bad: [''] },
+  '柳': { name: '柳', fortune: '凶', meaning: '万事に凶。特に結婚、種まきは大凶', good: ['葬儀'], bad: ['結婚', '建築', '種まき', '契約'] },
+  '星': { name: '星', fortune: '凶', meaning: '治療始め、便所改造のみ吉。他は凶', good: ['治療始め'], bad: ['結婚', '建築', '旅行', '葬儀'] },
+  '張': { name: '張', fortune: '大吉', meaning: '結婚、就職、神仏祈願、種まきに大吉', good: ['結婚', '就職', '祈願', '種まき', '養蚕'], bad: [] },
+  '翼': { name: '翼', fortune: '凶', meaning: '種まき、動土に吉。旅行、結婚は凶', good: ['種まき', '動土', '建築'], bad: ['結婚', '旅行', '葬儀'] },
+  '軫': { name: '軫', fortune: '吉', meaning: '建築、神仏祈願に吉。衣類裁断にも良い', good: ['建築', '祈願', '衣類裁断', '地鎮祭'], bad: ['結婚'] }
+};
+
+const nijuhassukuList = ['角', '亢', '氐', '房', '心', '尾', '箕', '斗', '牛', '女', '虚', '危', '室', '壁', '奎', '婁', '胃', '昴', '畢', '觜', '参', '井', '鬼', '柳', '星', '張', '翼', '軫'];
+
+// 二十八宿の計算（JDNベースの28日周期）
+// 基準日: 2026年1月1日のJDN、この日の二十八宿インデックスを設定
+const NIJUHASSUKU_BASE_JDN = 2461408; // 2026-01-01
+const NIJUHASSUKU_BASE_INDEX = 15; // 2026-01-01 の二十八宿インデックス（婁）
+
+export function getNijuhassukuByDate(year: number, month: number, day: number): string {
+  const jdn = getJDN(year, month, day);
+  const diff = jdn - NIJUHASSUKU_BASE_JDN;
+  const index = ((diff % 28) + NIJUHASSUKU_BASE_INDEX) % 28;
+  const normalizedIndex = ((index % 28) + 28) % 28;
+  return nijuhassukuList[normalizedIndex];
+}
+
+export function getTodayNijuhassuku(): string {
+  const today = new Date();
+  return getNijuhassukuByDate(today.getFullYear(), today.getMonth() + 1, today.getDate());
 }
 
 export function checkPurpose(rokuyoName: string, chokuName: string, purpose: string): { result: string; advice: string } {
