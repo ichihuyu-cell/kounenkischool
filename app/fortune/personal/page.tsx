@@ -55,7 +55,7 @@ export default function PersonalReportPage() {
             marginBottom: '12px',
             letterSpacing: '0.05em'
           }}>
-            パーソナルレポート 📊
+            今日の占い 📊
           </h1>
           <p style={{
             fontSize: '14px',
