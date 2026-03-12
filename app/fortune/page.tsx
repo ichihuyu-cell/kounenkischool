@@ -50,7 +50,7 @@ export default function FortuneIndexPage() {
     },
     {
       title: 'パーソナルレポート',
-      description: 'あなただけの詳細な運勢分析',
+      description: 'あなただけの花を見つける',
       icon: '📊',
       link: '/fortune/personal',
       gradient: 'linear-gradient(135deg, #E6D8F0 0%, #D8C8E0 100%)'

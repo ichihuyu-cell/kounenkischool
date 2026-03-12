@@ -62,7 +62,7 @@ export default function PersonalReportPage() {
             color: '#4A4A4A',
             fontWeight: '300'
           }}>
-            あなただけの詳細な運勢分析
+            あなただけの花を見つける
           </p>
         </div>
 
