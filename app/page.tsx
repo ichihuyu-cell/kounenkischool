@@ -300,13 +300,16 @@ export default function Home() {
             </a>
 
             {/* 特徴2 */}
-            <div style={{
+            <div
+              onClick={() => alert('この機能は現在製作中です。もうしばらくお待ちください🌙')}
+              style={{
               background: '#FFFFFF',
               borderRadius: '12px',
               padding: '40px',
               border: '1px solid #F0F0F0',
               textAlign: 'center',
-              transition: 'transform 0.3s'
+              transition: 'transform 0.3s',
+              cursor: 'pointer'
             }}>
               <div style={{
                 fontSize: '40px',
