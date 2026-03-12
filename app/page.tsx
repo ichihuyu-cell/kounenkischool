@@ -294,7 +294,7 @@ export default function Home() {
                   lineHeight: '1.8',
                   fontWeight: '300'
                 }}>
-                  242種類の症状から選んで記録。あなただけのデータが蓄積されます。
+                  3回タップで自分がわかる。身体や思考のパターンを知ろう
                 </p>
               </div>
             </a>
