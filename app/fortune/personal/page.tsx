@@ -241,6 +241,99 @@ export default function PersonalReportPage() {
               </p>
             </div>
 
+            {/* 花のメッセージ */}
+            {typeData.flowerInfo && (
+              <div style={{
+                background: 'linear-gradient(135deg, #faf6f0 0%, #f5ede3 100%)',
+                borderRadius: '12px',
+                padding: '32px',
+                border: '1px solid #e8ddd0',
+                marginBottom: '24px',
+              }}>
+                <h3 style={{
+                  fontSize: '20px',
+                  color: '#2C3E5F',
+                  fontWeight: '400',
+                  marginBottom: '20px',
+                  letterSpacing: '0.05em'
+                }}>
+                  {typeData.flower}からのメッセージ
+                </h3>
+                <p style={{
+                  fontSize: '15px',
+                  color: '#4A4A4A',
+                  lineHeight: '2.0',
+                  fontWeight: '300',
+                  marginBottom: '24px',
+                  fontStyle: 'italic',
+                }}>
+                  {typeData.flowerInfo.advice}
+                </p>
+
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  marginBottom: '16px',
+                }}>
+                  <span style={{ fontSize: '14px', color: '#2C3E5F', fontWeight: '400', letterSpacing: '0.03em' }}>
+                    花言葉
+                  </span>
+                  <span style={{
+                    fontSize: '14px',
+                    color: '#7a6853',
+                    fontWeight: '300',
+                  }}>
+                    ── {typeData.flowerInfo.hanakotoba}
+                  </span>
+                </div>
+
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                  gap: '12px',
+                }}>
+                  <div style={{
+                    padding: '12px 16px',
+                    background: 'rgba(255,255,255,0.7)',
+                    borderRadius: '8px',
+                    border: '1px solid #e8ddd0',
+                  }}>
+                    <div style={{ fontSize: '11px', color: '#9a8a78', fontWeight: '300', marginBottom: '4px', letterSpacing: '0.05em' }}>季節</div>
+                    <div style={{ fontSize: '13px', color: '#4A4A4A', fontWeight: '300' }}>{typeData.flowerInfo.season}</div>
+                  </div>
+                  <div style={{
+                    padding: '12px 16px',
+                    background: 'rgba(255,255,255,0.7)',
+                    borderRadius: '8px',
+                    border: '1px solid #e8ddd0',
+                  }}>
+                    <div style={{ fontSize: '11px', color: '#9a8a78', fontWeight: '300', marginBottom: '4px', letterSpacing: '0.05em' }}>色</div>
+                    <div style={{ fontSize: '13px', color: '#4A4A4A', fontWeight: '300' }}>{typeData.flowerInfo.color}</div>
+                  </div>
+                  <div style={{
+                    padding: '12px 16px',
+                    background: 'rgba(255,255,255,0.7)',
+                    borderRadius: '8px',
+                    border: '1px solid #e8ddd0',
+                  }}>
+                    <div style={{ fontSize: '11px', color: '#9a8a78', fontWeight: '300', marginBottom: '4px', letterSpacing: '0.05em' }}>香り</div>
+                    <div style={{ fontSize: '13px', color: '#4A4A4A', fontWeight: '300' }}>{typeData.flowerInfo.scent}</div>
+                  </div>
+                </div>
+
+                <p style={{
+                  fontSize: '13px',
+                  color: '#7a6853',
+                  lineHeight: '1.8',
+                  fontWeight: '300',
+                  marginTop: '16px',
+                }}>
+                  {typeData.flowerInfo.traits}
+                </p>
+              </div>
+            )}
+
             {/* あなたの本質 */}
             <div style={{
               background: '#FFFFFF',
