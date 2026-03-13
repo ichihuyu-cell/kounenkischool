@@ -188,6 +188,29 @@ export default function AboutPage() {
             </p>
           </div>
 
+          {/* なぜ私たちは「医療」ではないのか */}
+          <div style={{ marginBottom: '48px' }}>
+            <h2 style={{
+              fontSize: '24px',
+              color: '#2C3E5F',
+              fontWeight: '300',
+              marginBottom: '24px',
+              paddingBottom: '16px',
+              borderBottom: '1px solid #F0F0F0',
+              letterSpacing: '0.05em'
+            }}>
+              なぜ私たちは「医療」ではないのか
+            </h2>
+            <p style={{
+              fontSize: '15px',
+              color: '#4A4A4A',
+              lineHeight: '2',
+              fontWeight: '300'
+            }}>
+              私たちは更年期を「治すべき病気」としてだけでなく、「向き合い方を知るべき人生の季節」と捉えています。医師が「治療」のプロなら、このアプリはあなたの「暮らし」の伴走者。法的な診断の枠を超えて、もっと自由に、もっとあなたらしく毎日を整えるための心身のログを大切に守ります。
+            </p>
+          </div>
+
           {/* 想い */}
           <div>
             <h2 style={{

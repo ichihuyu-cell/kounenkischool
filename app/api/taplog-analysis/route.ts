@@ -125,7 +125,9 @@ ${summary}
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const text = message.content[0].type === 'text' ? message.content[0].text : '';
+    const rawText = message.content[0].type === 'text' ? message.content[0].text : '';
+    const disclaimer = '\n\n---\n※この内容は診断ではありません。強い不快感や異常を感じる場合は、このレポートを持って婦人科等の専門医へご相談されることをお勧めします。';
+    const text = rawText + disclaimer;
 
     console.log('AI Analysis: success, response length:', text.length);
 

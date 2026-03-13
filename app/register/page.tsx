@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -278,7 +279,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <div style={{ marginBottom: '32px' }}>
+            <div style={{ marginBottom: '20px' }}>
               <label style={{
                 display: 'block',
                 fontSize: '13px',
@@ -307,19 +308,52 @@ export default function RegisterPage() {
               />
             </div>
 
+            <div style={{
+              marginBottom: '32px',
+              padding: '16px',
+              background: '#FAFAFA',
+              borderRadius: '8px',
+              border: '1px solid #F0F0F0'
+            }}>
+              <label style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '10px',
+                cursor: 'pointer',
+                fontSize: '13px',
+                color: '#4A4A4A',
+                lineHeight: '1.8',
+                fontWeight: '300',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  style={{
+                    marginTop: '4px',
+                    accentColor: '#2C3E5F',
+                    flexShrink: 0,
+                  }}
+                />
+                <span>
+                  当アプリは医療機関の診断に代わるものではありません。AIのアドバイスは一般的なライフハックの提案です。自分を知るためのツールとして活用することに同意します。
+                </span>
+              </label>
+            </div>
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !agreed}
               style={{
                 width: '100%',
                 padding: '14px',
-                background: loading ? '#999' : '#2C3E5F',
+                background: (loading || !agreed) ? '#999' : '#2C3E5F',
                 color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '24px',
                 fontSize: '15px',
                 fontWeight: '300',
-                cursor: loading ? 'not-allowed' : 'pointer',
+                cursor: (loading || !agreed) ? 'not-allowed' : 'pointer',
                 letterSpacing: '0.05em'
               }}
             >
