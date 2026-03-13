@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Navigation from "./components/Navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,29 @@ export default function RootLayout({
       <head><link rel="apple-touch-icon" href="/apple-touch-icon.png" /></head><body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <div className="app-layout-wrapper">
+          <Navigation />
+          <div className="app-layout-main">
+            {children}
+          </div>
+        </div>
+        <style>{`
+          .app-layout-wrapper {
+            display: flex;
+            min-height: 100vh;
+          }
+          .app-layout-main {
+            flex: 1;
+            min-width: 0;
+            padding-bottom: 72px;
+          }
+          @media (min-width: 769px) {
+            .app-layout-main {
+              margin-left: 200px;
+              padding-bottom: 0;
+            }
+          }
+        `}</style>
       </body>
     </html>
   );
