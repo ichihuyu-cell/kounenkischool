@@ -29,8 +29,8 @@ export default function RegisterPage() {
       await updateProfile(userCredential.user, { displayName: name });
       // アバター自動生成・保存
       try {
-        const avatarBase64 = generateAvatar();
-        await setDoc(doc(db, 'users', userCredential.user.uid), { avatarBase64 }, { merge: true });
+        const avatarSvg = generateAvatar();
+        await setDoc(doc(db, 'users', userCredential.user.uid), { avatarSvg }, { merge: true });
       } catch (e) { console.error('Avatar generation error:', e); }
       router.push('/dashboard');
     } catch (err: any) {

@@ -209,7 +209,7 @@ export default function CommunityPage() {
     Promise.all(missing.map(async (uid) => {
       try {
         const snap = await getDoc(doc(db, 'users', uid));
-        return [uid, snap.exists() && snap.data().avatarBase64 ? snap.data().avatarBase64 : ''] as const;
+        return [uid, snap.exists() && snap.data().avatarSvg ? snap.data().avatarSvg : ''] as const;
       } catch { return [uid, ''] as const; }
     })).then(results => {
       const newCache: Record<string, string> = {};

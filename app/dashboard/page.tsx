@@ -17,8 +17,8 @@ export default function DashboardPage() {
         if (user.displayName) setUserName(user.displayName);
         try {
           const snap = await getDoc(doc(db, 'users', user.uid));
-          if (snap.exists() && snap.data().avatarBase64) {
-            setUserAvatar(snap.data().avatarBase64);
+          if (snap.exists() && snap.data().avatarSvg) {
+            setUserAvatar(snap.data().avatarSvg);
           }
         } catch (e) { console.error('Avatar load error:', e); }
       }
