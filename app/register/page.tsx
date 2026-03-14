@@ -27,11 +27,11 @@ export default function RegisterPage() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: name });
-      // アバター自動生成・保存
-      try {
-        const avatarSvg = generateAvatar();
-        await setDoc(doc(db, 'users', userCredential.user.uid), { avatarSvg }, { merge: true });
-      } catch (e) { console.error('Avatar generation error:', e); }
+      // アバター自動生成・Firestoreに保存
+      const avatarSvg = generateAvatar();
+      const userData: Record<string, string> = { avatarSvg };
+      if (birthYear) userData.birthYear = birthYear;
+      await setDoc(doc(db, 'users', userCredential.user.uid), userData, { merge: true });
       router.push('/dashboard');
     } catch (err: any) {
       console.error('Register error:', err.code, err.message);
