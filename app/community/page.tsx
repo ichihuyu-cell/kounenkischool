@@ -8,6 +8,7 @@ import {
   addDoc,
   onSnapshot,
   doc,
+  getDoc,
   updateDoc,
   arrayUnion,
   arrayRemove,
@@ -175,6 +176,7 @@ export default function CommunityPage() {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
   const [posting, setPosting] = useState(false);
+  const [avatarCache, setAvatarCache] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -197,6 +199,24 @@ export default function CommunityPage() {
     });
     return () => unsubscribe();
   }, []);
+
+  // 投稿者のアバターを読み込み
+  useEffect(() => {
+    const replyAuthorIds = posts.flatMap(p => (p.replies || []).map(r => r.authorId)).filter(Boolean);
+    const authorIds = [...new Set([...posts.map(p => p.authorId), ...replyAuthorIds].filter(Boolean))];
+    const missing = authorIds.filter(id => !(id in avatarCache));
+    if (missing.length === 0) return;
+    Promise.all(missing.map(async (uid) => {
+      try {
+        const snap = await getDoc(doc(db, 'users', uid));
+        return [uid, snap.exists() && snap.data().avatarBase64 ? snap.data().avatarBase64 : ''] as const;
+      } catch { return [uid, ''] as const; }
+    })).then(results => {
+      const newCache: Record<string, string> = {};
+      results.forEach(([uid, avatar]) => { newCache[uid] = avatar; });
+      setAvatarCache(prev => ({ ...prev, ...newCache }));
+    });
+  }, [posts]);
 
   const handleLike = async (postId: string) => {
     if (!user) return;
@@ -418,20 +438,19 @@ export default function CommunityPage() {
               marginBottom: '40px',
             }}>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <div style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, rgba(255,224,130,0.25), rgba(255,255,255,0.06))',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '20px',
-                  flexShrink: 0,
-                  border: '1px solid rgba(255,224,130,0.15)',
-                }}>
-                  🕊️
-                </div>
+                {user && avatarCache[user.uid] ? (
+                  <img src={avatarCache[user.uid]} alt="" style={{
+                    width: '42px', height: '42px', borderRadius: '50%', flexShrink: 0,
+                    border: '1px solid rgba(255,224,130,0.15)', objectFit: 'cover',
+                  }} />
+                ) : (
+                  <div style={{
+                    width: '42px', height: '42px', borderRadius: '50%',
+                    background: 'linear-gradient(135deg, rgba(255,224,130,0.25), rgba(255,255,255,0.06))',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '20px', flexShrink: 0, border: '1px solid rgba(255,224,130,0.15)',
+                  }}>🕊️</div>
+                )}
                 <div style={{ flex: 1 }}>
                   <textarea
                     value={newPost}
@@ -565,20 +584,19 @@ export default function CommunityPage() {
               >
                 {/* ヘッダー */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
-                  <div style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, rgba(255,224,130,0.18), rgba(255,255,255,0.05))',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '20px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    flexShrink: 0,
-                  }}>
-                    🕊️
-                  </div>
+                  {avatarCache[post.authorId] ? (
+                    <img src={avatarCache[post.authorId]} alt="" style={{
+                      width: '44px', height: '44px', borderRadius: '50%', flexShrink: 0,
+                      border: '1px solid rgba(255,255,255,0.1)', objectFit: 'cover',
+                    }} />
+                  ) : (
+                    <div style={{
+                      width: '44px', height: '44px', borderRadius: '50%',
+                      background: 'linear-gradient(135deg, rgba(255,224,130,0.18), rgba(255,255,255,0.05))',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '20px', border: '1px solid rgba(255,255,255,0.1)', flexShrink: 0,
+                    }}>🕊️</div>
+                  )}
                   <div style={{ flex: 1 }}>
                     <div style={{
                       fontSize: '14px',
@@ -701,20 +719,19 @@ export default function CommunityPage() {
                     borderTop: '1px solid rgba(255,255,255,0.04)',
                   }}>
                     <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                      <div style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, rgba(255,224,130,0.2), rgba(255,255,255,0.04))',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '14px',
-                        flexShrink: 0,
-                        border: '1px solid rgba(255,224,130,0.1)',
-                      }}>
-                        🕊️
-                      </div>
+                      {user && avatarCache[user.uid] ? (
+                        <img src={avatarCache[user.uid]} alt="" style={{
+                          width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0,
+                          border: '1px solid rgba(255,224,130,0.1)', objectFit: 'cover',
+                        }} />
+                      ) : (
+                        <div style={{
+                          width: '32px', height: '32px', borderRadius: '50%',
+                          background: 'linear-gradient(135deg, rgba(255,224,130,0.2), rgba(255,255,255,0.04))',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '14px', flexShrink: 0, border: '1px solid rgba(255,224,130,0.1)',
+                        }}>🕊️</div>
+                      )}
                       <div style={{ flex: 1 }}>
                         <textarea
                           value={replyText}
@@ -803,20 +820,19 @@ export default function CommunityPage() {
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                          <div style={{
-                            width: '28px',
-                            height: '28px',
-                            borderRadius: '50%',
-                            background: 'linear-gradient(135deg, rgba(255,224,130,0.12), rgba(255,255,255,0.03))',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '13px',
-                            border: '1px solid rgba(255,255,255,0.06)',
-                            flexShrink: 0,
-                          }}>
-                            🕊️
-                          </div>
+                          {avatarCache[reply.authorId] ? (
+                            <img src={avatarCache[reply.authorId]} alt="" style={{
+                              width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0,
+                              border: '1px solid rgba(255,255,255,0.06)', objectFit: 'cover',
+                            }} />
+                          ) : (
+                            <div style={{
+                              width: '28px', height: '28px', borderRadius: '50%',
+                              background: 'linear-gradient(135deg, rgba(255,224,130,0.12), rgba(255,255,255,0.03))',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: '13px', border: '1px solid rgba(255,255,255,0.06)', flexShrink: 0,
+                            }}>🕊️</div>
+                          )}
                           <span style={{
                             fontSize: '12px',
                             fontWeight: '400',

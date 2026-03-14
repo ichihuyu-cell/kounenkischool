@@ -4,7 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth } from '../../lib/firebase';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../../lib/firebase';
+import { generateAvatar } from '../lib/generateAvatar';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -25,6 +27,11 @@ export default function RegisterPage() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: name });
+      // アバター自動生成・保存
+      try {
+        const avatarBase64 = generateAvatar();
+        await setDoc(doc(db, 'users', userCredential.user.uid), { avatarBase64 }, { merge: true });
+      } catch (e) { console.error('Avatar generation error:', e); }
       router.push('/dashboard');
     } catch (err: any) {
       console.error('Register error:', err.code, err.message);

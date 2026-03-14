@@ -1,11 +1,30 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../../lib/firebase';
 import Header from '../components/Header';
 
 export default function DashboardPage() {
-  const [userName] = useState('イチフユ');
+  const [userName, setUserName] = useState('イチフユ');
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        if (user.displayName) setUserName(user.displayName);
+        try {
+          const snap = await getDoc(doc(db, 'users', user.uid));
+          if (snap.exists() && snap.data().avatarBase64) {
+            setUserAvatar(snap.data().avatarBase64);
+          }
+        } catch (e) { console.error('Avatar load error:', e); }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
   
   // 今日の運勢データ（サンプル）
   const todayLucky = {
@@ -51,7 +70,14 @@ export default function DashboardPage() {
         margin: '0 auto',
         padding: '40px 20px 60px'
       }}>
-        <div style={{ marginBottom: '40px' }}>
+        <div style={{ marginBottom: '40px', display: 'flex', alignItems: 'center', gap: '20px' }}>
+          {userAvatar && (
+            <img src={userAvatar} alt="" style={{
+              width: '64px', height: '64px', borderRadius: '50%',
+              border: '2px solid #F0F0F0', objectFit: 'cover', flexShrink: 0,
+            }} />
+          )}
+          <div>
           <h1 style={{
             fontSize: '36px',
             color: '#2C3E5F',
@@ -68,6 +94,7 @@ export default function DashboardPage() {
           }}>
             今日の調子はいかがですか？
           </p>
+          </div>
         </div>
 
         {/* ラッキー通知 - スーパーラッキーデー */}
