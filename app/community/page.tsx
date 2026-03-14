@@ -190,11 +190,24 @@ export default function CommunityPage() {
   useEffect(() => {
     const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const postsData: Post[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Post[];
+      const postsData: Post[] = snapshot.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          author: data.author || 'ゲスト',
+          authorId: data.authorId || '',
+          content: data.content || '',
+          likes: data.likes || 0,
+          likedBy: Array.isArray(data.likedBy) ? data.likedBy : [],
+          tag: data.tag || undefined,
+          replies: Array.isArray(data.replies) ? data.replies : [],
+          createdAt: data.createdAt || null,
+        };
+      });
       setPosts(postsData);
+      setPostsLoading(false);
+    }, (error) => {
+      console.error('Firestore onSnapshot error:', error);
       setPostsLoading(false);
     });
     return () => unsubscribe();
@@ -216,7 +229,7 @@ export default function CommunityPage() {
       results.forEach(([uid, avatar]) => { newCache[uid] = avatar; });
       setAvatarCache(prev => ({ ...prev, ...newCache }));
     });
-  }, [posts]);
+  }, [posts, avatarCache]);
 
   const handleLike = async (postId: string) => {
     if (!user) return;
