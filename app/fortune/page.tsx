@@ -42,11 +42,11 @@ export default function FortuneIndexPage() {
       gradient: 'linear-gradient(135deg, #2C3E5F 0%, #3d5278 100%)'
     },
     {
-      title: '高島暦',
-      description: '古からの知恵が示す、吉日と凶日',
-      icon: '📖',
-      link: '/fortune/takashima',
-      gradient: 'linear-gradient(135deg, #F0F0F0 0%, #E8EAF0 100%)'
+      title: '星座占い',
+      description: '12星座が導く、今日のあなたの運勢',
+      icon: '⭐',
+      link: '/fortune/horoscope',
+      gradient: 'linear-gradient(135deg, #E8EDF5 0%, #D4DCE8 100%)'
     },
     {
       title: 'パーソナルレポート',
@@ -131,7 +131,7 @@ export default function FortuneIndexPage() {
             lineHeight: '1.8'
           }}>
             月明かりに照らされた、あなただけの特別な占いの世界へようこそ。<br />
-            生年月日、血液型、月の満ち欠け、高島暦が織りなす、精緻な運勢をお届けします。
+            生年月日、血液型、月の満ち欠け、星座が織りなす、精緻な運勢をお届けします。
           </p>
         </div>
 

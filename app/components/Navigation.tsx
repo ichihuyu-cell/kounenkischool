@@ -9,7 +9,6 @@ const navItems = [
   { emoji: '📝', label: '記録', href: 'https://taplog-pink.vercel.app', external: true },
   { emoji: '🌙', label: '占い', href: '/fortune', external: false },
   { emoji: '🌿', label: '広場', href: '/community', external: false },
-  { emoji: '📅', label: '高島暦', href: '/fortune/takashima', external: false },
 ];
 
 export default function Navigation() {
