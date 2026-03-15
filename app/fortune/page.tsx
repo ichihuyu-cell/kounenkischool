@@ -539,16 +539,23 @@ export default function FortunePage() {
     return () => unsub();
   }, []);
 
+  const [saveError, setSaveError] = useState('');
+
   // ── プロフィール保存 ──
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uid || !formBirthday || !formBlood) return;
     setSaving(true);
+    setSaveError('');
     try {
       await setDoc(doc(db, 'users', uid), { birthday: formBirthday, bloodType: formBlood }, { merge: true });
       setProfile({ birthday: formBirthday, bloodType: formBlood });
-    } catch (err) { console.error('Profile save error:', err); }
-    setSaving(false);
+    } catch (err: any) {
+      console.error('Profile save error:', err);
+      setSaveError('保存に失敗しました。通信環境を確認してもう一度お試しください。');
+    } finally {
+      setSaving(false);
+    }
   };
 
   // ── AI メッセージ取得 ──
@@ -674,6 +681,12 @@ export default function FortunePage() {
                 ))}
               </div>
             </div>
+            {saveError && (
+              <div style={{
+                padding: '12px', background: '#FFF0F0', border: '1px solid #FFE0E0',
+                borderRadius: '8px', marginBottom: '16px', fontSize: '14px', color: '#D32F2F', fontWeight: '300',
+              }}>{saveError}</div>
+            )}
             <button type="submit" disabled={saving || !formBirthday || !formBlood} style={{
               width: '100%', padding: '14px', background: (saving || !formBirthday || !formBlood) ? '#999' : '#2C3E5F',
               color: '#FFF', border: 'none', borderRadius: '24px', fontSize: '15px', fontWeight: '300',
