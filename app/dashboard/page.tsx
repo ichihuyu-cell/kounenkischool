@@ -70,14 +70,14 @@ export default function DashboardPage() {
         margin: '0 auto',
         padding: '40px 20px 60px'
       }}>
-        <div style={{ marginBottom: '40px', display: 'flex', alignItems: 'center', gap: '20px', padding: '0 8px' }}>
+        <div style={{ marginBottom: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', padding: '0 8px' }}>
           {userAvatar && (
             <img src={userAvatar} alt="" style={{
               width: '64px', height: '64px', borderRadius: '50%',
               border: '2px solid #F0F0F0', objectFit: 'cover', flexShrink: 0,
             }} />
           )}
-          <div>
+          <div style={{ textAlign: 'center' }}>
           <h1 style={{
             fontSize: 'clamp(18px, 4.5vw, 30px)',
             color: '#2C3E5F',
