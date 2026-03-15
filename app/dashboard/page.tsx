@@ -79,11 +79,13 @@ export default function DashboardPage() {
           )}
           <div>
           <h1 style={{
-            fontSize: '36px',
+            fontSize: 'clamp(20px, 5vw, 36px)',
             color: '#2C3E5F',
             fontWeight: '300',
             marginBottom: '8px',
-            letterSpacing: '0.05em'
+            letterSpacing: '0.05em',
+            wordBreak: 'break-word' as const,
+            overflowWrap: 'break-word' as const,
           }}>
             おかえりなさい、{userName}さん
           </h1>
