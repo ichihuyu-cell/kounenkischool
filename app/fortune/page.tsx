@@ -525,7 +525,10 @@ export default function FortunePage() {
       if (user) {
         setUid(user.uid);
         try {
-          const snap = await getDoc(doc(db, 'users', user.uid, 'profile', 'main'));
+          const profileRef = doc(db, 'users', user.uid);
+          console.log('[Fortune] Loading profile from:', profileRef.path);
+          const snap = await getDoc(profileRef);
+          console.log('[Fortune] Profile doc exists:', snap.exists(), snap.exists() ? snap.data() : '(no data)');
           if (snap.exists()) {
             const d = snap.data();
             if (d.birthday && d.bloodType) {
@@ -548,11 +551,16 @@ export default function FortunePage() {
     setSaving(true);
     setSaveError('');
     try {
-      await setDoc(doc(db, 'users', uid, 'profile', 'main'), { birthday: formBirthday, bloodType: formBlood }, { merge: true });
+      const profileRef = doc(db, 'users', uid);
+      console.log('[Fortune] Saving profile to:', profileRef.path, { birthday: formBirthday, bloodType: formBlood });
+      await setDoc(profileRef, { birthday: formBirthday, bloodType: formBlood }, { merge: true });
+      console.log('[Fortune] Profile saved successfully');
       setProfile({ birthday: formBirthday, bloodType: formBlood });
     } catch (err: any) {
-      console.error('Profile save error:', err);
-      setSaveError('保存に失敗しました。通信環境を確認してもう一度お試しください。');
+      console.error('[Fortune] Profile save FAILED:', err);
+      console.error('[Fortune] Error code:', err.code);
+      console.error('[Fortune] Error message:', err.message);
+      setSaveError(`保存に失敗しました（${err.code || '不明なエラー'}）。通信環境を確認してもう一度お試しください。`);
     } finally {
       setSaving(false);
     }
