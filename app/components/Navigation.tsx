@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 
 const navItems = [
   { emoji: '🏠', label: 'ホーム', href: '/', external: false },
-  { emoji: '📝', label: '記録', href: '/daily', external: false },
+  { emoji: '📝', label: '記録', href: 'https://taplog-pink.vercel.app', external: true },
   { emoji: '🔮', label: '占い', href: '/fortune', external: false },
   { emoji: '💬', label: '広場', href: '/community', external: false },
 ];
