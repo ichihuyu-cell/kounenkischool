@@ -70,7 +70,7 @@ export default function DashboardPage() {
         margin: '0 auto',
         padding: '40px 20px 60px'
       }}>
-        <div style={{ marginBottom: '40px', display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div style={{ marginBottom: '40px', display: 'flex', alignItems: 'center', gap: '20px', padding: '0 8px' }}>
           {userAvatar && (
             <img src={userAvatar} alt="" style={{
               width: '64px', height: '64px', borderRadius: '50%',
@@ -79,7 +79,7 @@ export default function DashboardPage() {
           )}
           <div>
           <h1 style={{
-            fontSize: 'clamp(20px, 5vw, 36px)',
+            fontSize: 'clamp(18px, 4.5vw, 30px)',
             color: '#2C3E5F',
             fontWeight: '300',
             marginBottom: '8px',
