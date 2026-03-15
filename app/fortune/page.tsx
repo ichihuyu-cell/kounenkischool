@@ -525,7 +525,7 @@ export default function FortunePage() {
       if (user) {
         setUid(user.uid);
         try {
-          const snap = await getDoc(doc(db, 'users', user.uid));
+          const snap = await getDoc(doc(db, 'users', user.uid, 'profile', 'main'));
           if (snap.exists()) {
             const d = snap.data();
             if (d.birthday && d.bloodType) {
@@ -548,7 +548,7 @@ export default function FortunePage() {
     setSaving(true);
     setSaveError('');
     try {
-      await setDoc(doc(db, 'users', uid), { birthday: formBirthday, bloodType: formBlood }, { merge: true });
+      await setDoc(doc(db, 'users', uid, 'profile', 'main'), { birthday: formBirthday, bloodType: formBlood }, { merge: true });
       setProfile({ birthday: formBirthday, bloodType: formBlood });
     } catch (err: any) {
       console.error('Profile save error:', err);
