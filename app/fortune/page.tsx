@@ -525,7 +525,7 @@ export default function FortunePage() {
       if (user) {
         setUid(user.uid);
         try {
-          const profileRef = doc(db, 'users', user.uid);
+          const profileRef = doc(db, 'users', user.uid, 'profile', 'main');
           console.log('[Fortune] Loading profile from:', profileRef.path);
           const snap = await getDoc(profileRef);
           console.log('[Fortune] Profile doc exists:', snap.exists(), snap.exists() ? snap.data() : '(no data)');
@@ -551,7 +551,7 @@ export default function FortunePage() {
     setSaving(true);
     setSaveError('');
     try {
-      const profileRef = doc(db, 'users', uid);
+      const profileRef = doc(db, 'users', uid, 'profile', 'main');
       console.log('[Fortune] Saving profile to:', profileRef.path, { birthday: formBirthday, bloodType: formBlood });
       await setDoc(profileRef, { birthday: formBirthday, bloodType: formBlood }, { merge: true });
       console.log('[Fortune] Profile saved successfully');
