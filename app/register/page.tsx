@@ -209,6 +209,8 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="email"
+                name="email"
                 style={{
                   width: '100%',
                   padding: '12px 16px',
@@ -240,6 +242,8 @@ export default function RegisterPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
+                  autoComplete="new-password"
+                  name="password"
                   style={{
                     width: '100%',
                     padding: '12px 44px 12px 16px',

@@ -1,14 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
 
+const SAVED_EMAIL_KEY = 'runeera_saved_email';
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    const saved = localStorage.getItem(SAVED_EMAIL_KEY);
+    if (saved) setEmail(saved);
+  }, []);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showReset, setShowReset] = useState(false);
@@ -69,6 +76,7 @@ export default function LoginPage() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      localStorage.setItem(SAVED_EMAIL_KEY, email);
       router.push('/dashboard');
     } catch (err: any) {
       console.error('Login error:', err.code, err.message);
@@ -218,6 +226,8 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="email"
+                name="email"
                 style={{
                   width: '100%',
                   padding: '12px 16px',
@@ -251,6 +261,8 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  autoComplete="current-password"
+                  name="password"
                   style={{
                     width: '100%',
                     padding: '12px 44px 12px 16px',

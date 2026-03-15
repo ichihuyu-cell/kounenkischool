@@ -14,6 +14,11 @@ const navItems = [
 export default function Navigation() {
   const pathname = usePathname();
 
+  // ログイン・新規登録画面ではナビゲーションを非表示
+  if (pathname === '/login' || pathname === '/register') {
+    return null;
+  }
+
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
     return pathname.startsWith(href);
